@@ -2,6 +2,9 @@
 
 Read your visual selection using the [edge_tts](https://github.com/rany2/edge-tts) python library.
 
+
+https://github.com/user-attachments/assets/a1f7fa26-eafc-49c4-b273-1332a726ee17
+
 # Dependencies
 
 - ffplay
