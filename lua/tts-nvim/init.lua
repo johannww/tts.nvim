@@ -23,7 +23,9 @@ M.tts = function()
         args = {search_string},
         cwd = ".",
         on_stderr = function(_, data)
-            print("stderr: ", data)
+            if data ~= nil then
+                print("stderr: ", data)
+            end
         end,
     })
     job:start()
