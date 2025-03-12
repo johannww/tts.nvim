@@ -23,4 +23,7 @@ Lazy:
     config = function() require("tts-nvim").setup() end,
 },
 
+# Disclaimer
+
+For now we hardcode the selected voice to "en-GB-SoniaNeural". This will change in the future.
 ```
