@@ -13,5 +13,11 @@ Read your visual selection using the [edge_tts](https://github.com/rany2/edge-tt
 Lazy:
 
 ```lua
+{
+    "johannww/tts.nvim",
+    cmd = { "TTS" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function() require("tts-nvim").setup() end,
+},
 
 ```
