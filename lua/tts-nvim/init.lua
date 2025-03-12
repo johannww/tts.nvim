@@ -1,7 +1,5 @@
 M = {}
 
-M.setup = function() end
-
 local Job = require("plenary.job")
 local util = require("tts-nvim.util")
 
@@ -19,7 +17,7 @@ M.tts = function()
         search_string = search_string .. string.sub(lines[#lines], 0, coords["column_end"])
     end
 
-    local pythonScriptPath = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%.lua", "tts.py")
+    local pythonScriptPath = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "tts.py")
     local job = Job:new({
         command = pythonScriptPath,
         args = {search_string},
@@ -28,10 +26,13 @@ M.tts = function()
     job:start()
 end
 
-vim.api.nvim_create_user_command(
-    "TTS",
-    function (args) require('tts').tts() end,
-    {range = true}
-)
+M.setup = function()
+    vim.api.nvim_create_user_command(
+        "TTS",
+        function (args) M.tts() end,
+        {range = true}
+    )
+end
 
 return M
+
