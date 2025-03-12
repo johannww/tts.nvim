@@ -11,9 +11,10 @@ VOICE = "en-GB-SoniaNeural"
 communicate = edge_tts.Communicate(text, VOICE)
 
 async def stream_audio():
-    ffplay = subprocess.Popen(["ffplay", "-i", "-", "-autoexit"], stdin=subprocess.PIPE)
+    ffplay = subprocess.Popen(["ffplay", "-i", "-", "-autoexit"],
+                              stdin=subprocess.PIPE, start_new_session=True,
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     async for chunk in communicate.stream():
-        print(chunk.keys())
         if chunk["type"] == "audio":
             ffplay.stdin.write(chunk["data"])
             ffplay.stdin.flush()
