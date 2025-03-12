@@ -22,6 +22,9 @@ M.tts = function()
         command = pythonScriptPath,
         args = {search_string},
         cwd = ".",
+        on_stderr = function(_, data)
+            print("stderr: ", data)
+        end,
     })
     job:start()
 end
