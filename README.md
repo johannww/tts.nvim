@@ -51,6 +51,3 @@ or:
 edge-tts -l
 ```
 
-# Disclaimer
-
-For now we hardcode the selected voice to "en-GB-SoniaNeural". This will change in the future.
