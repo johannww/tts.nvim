@@ -6,9 +6,9 @@ import edge_tts
 import asyncio
 
 text = os.sys.argv[1]
-VOICE = "en-GB-SoniaNeural"
+voice = os.sys.argv[2]
 
-communicate = edge_tts.Communicate(text, VOICE)
+communicate = edge_tts.Communicate(text, voice)
 
 async def stream_audio():
     ffplay = subprocess.Popen(["ffplay", "-i", "-", "-autoexit"],

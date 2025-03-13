@@ -20,9 +20,23 @@ Lazy:
     "johannww/tts.nvim",
     cmd = { "TTS" },
     dependencies = { "nvim-lua/plenary.nvim" },
-    config = function() require("tts-nvim").setup() end,
+    opts = {
+        voice = "en-GB-SoniaNeural",
+    },
 },
 
+```
+
+## List voices
+
+```bash
+python -m edge_tts --list-voices
+```
+
+or:
+
+```bash
+edge-tts -l
 ```
 
 # Disclaimer
