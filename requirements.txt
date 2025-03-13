@@ -1,1 +1,1 @@
-edge_tts
+edge-tts
