@@ -8,7 +8,19 @@ https://github.com/user-attachments/assets/a1f7fa26-eafc-49c4-b273-1332a726ee17
 # Dependencies
 
 - ffplay
+```bash
+sudo apt install ffmpeg
+```
+```bash
+sudo pacman -S ffmpeg
+```
 - edge_tts
+```bash
+pip install edge-tts
+```
+```bash
+yay -S python-edge-tts
+```
 - plenary.nvim
 
 # Installation
