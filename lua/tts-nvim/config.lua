@@ -2,6 +2,7 @@ M = {}
 
 M.opts = {
     voice = "en-GB-SoniaNeural",
+    speed = 1.0,
 }
 
 M.setup_config = function(opts)
