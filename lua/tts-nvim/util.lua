@@ -21,4 +21,18 @@ M.getVisualSelection = function()
     return lines, coordinates
 end
 
+M.getTextFromSelection = function(lines, coords)
+    local search_string = ""
+    if coords["line_start"] == coords["line_end"] then
+        search_string = string.sub(lines[1], coords["column_start"], coords["column_end"])
+    else
+        search_string = string.sub(lines[1], coords["column_start"], -1)
+        for i = 2, (#lines - 1) do
+            search_string = search_string .. lines[i]
+        end
+        search_string = search_string .. string.sub(lines[#lines], 0, coords["column_end"])
+    end
+    return search_string
+end
+
 return M

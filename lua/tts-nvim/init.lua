@@ -6,17 +6,7 @@ local config = require("tts-nvim.config")
 
 M.tts = function()
     local lines, coords = util.getVisualSelection()
-
-    local search_string = ""
-    if coords["line_start"] == coords["line_end"] then
-        search_string = string.sub(lines[1], coords["column_start"], coords["column_end"])
-    else
-        search_string = string.sub(lines[1], coords["column_start"], -1)
-        for i = 2, (#lines - 1) do
-            search_string = search_string .. lines[i]
-        end
-        search_string = search_string .. string.sub(lines[#lines], 0, coords["column_end"])
-    end
+    local search_string = util.getTextFromSelection(lines, coords)
 
     local pythonScriptPath = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "tts.py")
     local job = Job:new({
