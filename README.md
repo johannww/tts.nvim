@@ -2,6 +2,8 @@
 
 Read your visual selection using the [edge-tts](https://github.com/rany2/edge-tts) python library.
 
+"TTS" command reads the visual selection using `ffplay`, while "TTSFile" outputs the audio to a file.
+
 
 https://github.com/user-attachments/assets/f331db4b-ace3-475d-8423-e5e3df81083b
 
@@ -30,7 +32,7 @@ Lazy:
 ```lua
 {
     "johannww/tts.nvim",
-    cmd = { "TTS" },
+    cmd = { "TTS", "TTSFile" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
         voice = "en-GB-SoniaNeural",
