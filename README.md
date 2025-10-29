@@ -32,11 +32,22 @@ Lazy:
 ```lua
 {
     "johannww/tts.nvim",
-    cmd = { "TTS", "TTSFile" },
+    cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
-        voice = "en-GB-SoniaNeural",
         speed = 1.0,
+        language = "pt",
+        speed = 1.5,
+        language_to_voice = {
+            ["en"] = "en-GB-SoniaNeural",
+            ["pt"] = "pt-BR-AntonioNeural",
+            ["es"] = "es-ES-ElviraNeural",
+            ["fr"] = "fr-FR-DeniseNeural",
+            ["de"] = "de-DE-KatjaNeural",
+            ["it"] = "it-IT-ElsaNeural",
+            ["ja"] = "ja-JP-NanamiNeural",
+            ["zh"] = "zh-CN-XiaoxiaoNeural",
+        },
     },
 },
 
