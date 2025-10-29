@@ -35,9 +35,8 @@ Lazy:
     cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
+        language = "en",
         speed = 1.0,
-        language = "pt",
-        speed = 1.5,
         language_to_voice = {
             ["en"] = "en-GB-SoniaNeural",
             ["pt"] = "pt-BR-AntonioNeural",
