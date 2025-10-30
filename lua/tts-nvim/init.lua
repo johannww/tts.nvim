@@ -45,7 +45,6 @@ end
 
 M.tts_set_language = function(args)
     local lang = args.fargs[1]
-    print("Setting TTS language to " .. vim.inspect(lang))
     local voice = config.opts.languages_to_voice[lang]
     if voice ~= nil then
         config.opts.voice = voice
