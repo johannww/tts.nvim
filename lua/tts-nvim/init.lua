@@ -3,6 +3,7 @@ M = {}
 local Job = require("plenary.job")
 local util = require("tts-nvim.util")
 local config = require("tts-nvim.config")
+local nvimDataDir = vim.fn.stdpath("data") .. "/tts-nvim/"
 
 M.tts = function()
     local lines, coords = util.getVisualSelection()
@@ -12,7 +13,7 @@ M.tts = function()
     local voice = config.opts.languages_to_voice[config.opts.language]
     local job = Job:new({
         command = pythonScriptPath,
-        args = {search_string, voice, config.opts.speed},
+        args = {search_string, voice, config.opts.speed, nvimDataDir},
         cwd = ".",
         on_stderr = function(_, data)
             if data ~= nil then
@@ -31,7 +32,7 @@ M.tts_to_file = function()
     local voice = config.opts.languages_to_voice[config.opts.language]
     local job = Job:new({
         command = pythonScriptPath,
-        args = {search_string, voice, config.opts.speed, "tts.mp3"},
+        args = {search_string, voice, config.opts.speed, nvimDataDir, "tts.mp3"},
         cwd = ".",
         on_stderr = function(_, data)
             if data ~= nil then
@@ -65,6 +66,7 @@ end
 
 M.setup = function(opts)
     config.setup_config(opts)
+    os.execute("mkdir -p " .. nvimDataDir)
 end
 
 return M
