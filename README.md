@@ -1,4 +1,4 @@
-# Text-to-speech in neovim
+# Text-to-speech in Neovim
 
 Read your visual selection using the [edge-tts](https://github.com/rany2/edge-tts) python library.
 
