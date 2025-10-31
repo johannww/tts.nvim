@@ -42,8 +42,11 @@ async def stream_audio():
 
     async for chunk in communicate.stream():
         if chunk["type"] == "audio":
-            ffplay.stdin.write(chunk["data"])
-            ffplay.stdin.flush()
+            try:
+                ffplay.stdin.write(chunk["data"])
+                ffplay.stdin.flush()
+            except BrokenPipeError:
+                break
         elif chunk["type"] == "WordBoundary":
             pass
 
