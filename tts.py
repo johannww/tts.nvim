@@ -18,22 +18,27 @@ communicate = edge_tts.Communicate(text, voice, rate="+"+str(rate)+"%")
 def kill_existing_process():
     if os.path.exists(pid_file):
         with open(pid_file, "r") as f:
-            existing_pid = int(f.read().strip())
+            lines = f.readlines()
         try:
-            os.kill(existing_pid, 9)
-        except ProcessLookupError:
+            for line in lines:
+                if line.strip().isdigit():
+                    pid = int(line.strip())
+                    os.kill(pid, 9)
+        except Exception:
             pass
 
-def write_ffplay_pid(pid: int):
+def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
+    lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
     with open(pid_file, "w") as f:
-        f.write(str(pid))
+        f.writelines(lines)
 
 async def stream_audio():
     kill_existing_process()
     ffplay = subprocess.Popen(["ffplay", "-i", "-", "-autoexit"],
                               stdin=subprocess.PIPE, start_new_session=True,
                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    write_ffplay_pid(ffplay.pid)
+    thispid = os.getpid()
+    write_pids_to_file(thispid, ffplay.pid)
 
     async for chunk in communicate.stream():
         if chunk["type"] == "audio":
