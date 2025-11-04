@@ -29,7 +29,6 @@ yay -S python-edge-tts
 
 ## Optional (for syntax removal)
 
-- **nvim-treesitter** (recommended): For treesitter-based syntax removal. If unavailable, falls back to pattern-based removal.
 - **pandoc**: For pandoc-based syntax removal. Only required if using `syntax_removal_method = "pandoc"`.
 ```bash
 sudo apt install pandoc
@@ -46,15 +45,15 @@ The plugin can remove syntax from Markdown and LaTeX files before reading them a
 
 Two methods are supported:
 
-1. **Treesitter** (default): Uses Neovim's treesitter to parse the document and extract text content. Falls back to simple pattern-based removal if treesitter is unavailable.
-2. **Pandoc**: Uses pandoc to convert Markdown/LaTeX to plain text. Requires pandoc to be installed.
+1. **Simple** (default): Uses pattern-based regex to remove common markdown and LaTeX syntax. Works without any external dependencies.
+2. **Pandoc**: Uses pandoc to convert Markdown/LaTeX to plain text. Requires pandoc to be installed. Falls back to simple method if pandoc fails.
 
 To enable syntax removal, set `remove_syntax = true` in your configuration:
 
 ```lua
 require("tts-nvim").setup({
     remove_syntax = true,
-    syntax_removal_method = "treesitter", -- or "pandoc"
+    syntax_removal_method = "simple", -- or "pandoc"
 })
 ```
 
@@ -71,7 +70,7 @@ Lazy:
         language = "en",
         speed = 1.0,
         remove_syntax = false, -- Enable syntax removal for Markdown and LaTeX
-        syntax_removal_method = "treesitter", -- "treesitter" (optional, falls back to regex) or "pandoc" (requires pandoc)
+        syntax_removal_method = "simple", -- "simple" (pattern-based) or "pandoc" (requires pandoc)
         language_to_voice = {
             ["en"] = "en-GB-SoniaNeural",
             ["pt"] = "pt-BR-AntonioNeural",
