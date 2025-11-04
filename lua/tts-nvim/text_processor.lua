@@ -117,7 +117,7 @@ M.process_text = function(text, filetype, config)
         return text
     end
 
-    local method = config.syntax_removal_method or "simple"
+    local method = config.syntax_removal_method or "pandoc"
 
     if filetype == "markdown" then
         if method == "pandoc" then

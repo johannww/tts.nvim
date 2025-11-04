@@ -53,7 +53,7 @@ To enable syntax removal, set `remove_syntax = true` in your configuration:
 ```lua
 require("tts-nvim").setup({
     remove_syntax = true,
-    syntax_removal_method = "simple", -- or "pandoc"
+    syntax_removal_method = "pandoc", -- or "simple"
 })
 ```
 
@@ -70,7 +70,7 @@ Lazy:
         language = "en",
         speed = 1.0,
         remove_syntax = false, -- Enable syntax removal for Markdown and LaTeX
-        syntax_removal_method = "simple", -- "simple" (pattern-based) or "pandoc" (requires pandoc)
+        syntax_removal_method = "pandoc", -- "simple" (pattern-based) or "pandoc" (requires pandoc)
         language_to_voice = {
             ["en"] = "en-GB-SoniaNeural",
             ["pt"] = "pt-BR-AntonioNeural",
