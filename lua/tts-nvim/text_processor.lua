@@ -6,25 +6,25 @@ M.process_markdown_simple = function(text)
     -- Remove heading markers
     text = text:gsub("^#+%s+", "")
     text = text:gsub("\n#+%s+", "\n")
-    
+
     -- Remove bold and italic markers
     text = text:gsub("%*%*(.-)%*%*", "%1")
     text = text:gsub("__(.-)__", "%1")
     text = text:gsub("%*(.-)%*", "%1")
     text = text:gsub("_(.-)_", "%1")
-    
+
     -- Remove links but keep text
     text = text:gsub("%[(.-)%]%(.-)", "%1")
-    
+
     -- Remove inline code
     text = text:gsub("`(.-)`", "%1")
-    
+
     -- Remove list markers
     text = text:gsub("^%s*[%*%-+]%s+", "")
     text = text:gsub("\n%s*[%*%-+]%s+", "\n")
     text = text:gsub("^%s*%d+%.%s+", "")
     text = text:gsub("\n%s*%d+%.%s+", "\n")
-    
+
     return text
 end
 
@@ -32,17 +32,17 @@ end
 M.process_latex_simple = function(text)
     -- Remove percent comments (must be done first to avoid processing commented commands)
     text = text:gsub("%%[^\n]*", "")
-    
+
     -- Remove common LaTeX commands (with optional star and followed by space or brace)
     text = text:gsub("\\[a-zA-Z]+%*?[%s{]", " ")
     text = text:gsub("\\[a-zA-Z]+%*?$", "")
-    
+
     -- Remove braces that are left over
     text = text:gsub("[{}]", "")
-    
+
     -- Remove dollar signs for math mode
     text = text:gsub("%$", "")
-    
+
     return text
 end
 
@@ -52,41 +52,41 @@ M.process_markdown_treesitter = function(text)
     if not has_ts then
         return M.process_markdown_simple(text)
     end
-    
+
     -- Create a temporary buffer to parse the text
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(text, "\n"))
     vim.bo[buf].filetype = "markdown"
-    
+
     -- Get the parser
     local ok, parser = pcall(vim.treesitter.get_parser, buf, "markdown")
     if not ok or not parser then
         vim.api.nvim_buf_delete(buf, { force = true })
         return M.process_markdown_simple(text)
     end
-    
+
     local trees = parser:parse()
     if not trees or #trees == 0 then
         vim.api.nvim_buf_delete(buf, { force = true })
         return M.process_markdown_simple(text)
     end
-    
+
     local root = trees[1]:root()
-    
+
     -- Extract text content, excluding markup
     local result = {}
-    
+
     -- Try to get text nodes
     local function extract_text(node)
         local node_type = node:type()
-        
+
         -- Skip certain node types
         if node_type == "code_fence_delimiter" or 
            node_type == "fenced_code_block_delimiter" or
            node_type == "info_string" then
             return
         end
-        
+
         if node:child_count() == 0 then
             local text_content = vim.treesitter.get_node_text(node, buf)
             if text_content and text_content:match("%S") then
@@ -98,11 +98,11 @@ M.process_markdown_treesitter = function(text)
             end
         end
     end
-    
+
     extract_text(root)
-    
+
     vim.api.nvim_buf_delete(buf, { force = true })
-    
+
     if #result > 0 then
         local combined = table.concat(result, " ")
         -- Clean up extra spaces
@@ -119,33 +119,33 @@ M.process_latex_treesitter = function(text)
     if not has_ts then
         return M.process_latex_simple(text)
     end
-    
+
     -- Create a temporary buffer to parse the text
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(text, "\n"))
     vim.bo[buf].filetype = "tex"
-    
+
     -- Get the parser
     local ok, parser = pcall(vim.treesitter.get_parser, buf, "latex")
     if not ok or not parser then
         vim.api.nvim_buf_delete(buf, { force = true })
         return M.process_latex_simple(text)
     end
-    
+
     local trees = parser:parse()
     if not trees or #trees == 0 then
         vim.api.nvim_buf_delete(buf, { force = true })
         return M.process_latex_simple(text)
     end
-    
+
     local root = trees[1]:root()
-    
+
     -- Extract text content, excluding commands
     local result = {}
-    
+
     local function extract_text(node)
         local node_type = node:type()
-        
+
         -- Focus on text content nodes
         if node_type == "text_mode" or node_type == "text" then
             local text_content = vim.treesitter.get_node_text(node, buf)
@@ -158,11 +158,11 @@ M.process_latex_treesitter = function(text)
             end
         end
     end
-    
+
     extract_text(root)
-    
+
     vim.api.nvim_buf_delete(buf, { force = true })
-    
+
     if #result > 0 then
         local combined = table.concat(result, " ")
         -- Clean up extra spaces
@@ -176,8 +176,8 @@ end
 -- Remove markdown syntax using pandoc
 M.process_markdown_pandoc = function(text)
     local result_lines = {}
-    local has_error = false
-    
+    local err_lines = {}
+
     local job = Job:new({
         command = "pandoc",
         args = { "-f", "markdown", "-t", "plain", "--wrap=none" },
@@ -186,24 +186,20 @@ M.process_markdown_pandoc = function(text)
             table.insert(result_lines, data)
         end,
         on_stderr = function(_, data)
-            has_error = true
-            vim.schedule(function()
-                vim.notify("TTS pandoc error: " .. data, vim.log.levels.WARN)
-            end)
-        end,
-        on_exit = function(_, code)
-            if code ~= 0 then
-                has_error = true
-            end
+            table.insert(err_lines, data)
         end,
     })
-    
+
     job:sync()
-    
-    if #result_lines > 0 and not has_error then
+
+    if #err_lines > 0 then
+        print("Error from pandoc: ", table.concat(err_lines, "\n"))
+    end
+
+    if #result_lines > 0 then
         return table.concat(result_lines, "\n")
     else
-        -- Fallback to simple processing if pandoc failed
+        print("Pandoc failed to process markdown text. Falling back to simple processing.")
         return M.process_markdown_simple(text)
     end
 end
@@ -211,8 +207,8 @@ end
 -- Remove LaTeX syntax using pandoc
 M.process_latex_pandoc = function(text)
     local result_lines = {}
-    local has_error = false
-    
+    local err_lines = {}
+
     local job = Job:new({
         command = "pandoc",
         args = { "-f", "latex", "-t", "plain", "--wrap=none" },
@@ -221,24 +217,20 @@ M.process_latex_pandoc = function(text)
             table.insert(result_lines, data)
         end,
         on_stderr = function(_, data)
-            has_error = true
-            vim.schedule(function()
-                vim.notify("TTS pandoc error: " .. data, vim.log.levels.WARN)
-            end)
-        end,
-        on_exit = function(_, code)
-            if code ~= 0 then
-                has_error = true
-            end
+            table.insert(err_lines, data)
         end,
     })
-    
+
     job:sync()
-    
-    if #result_lines > 0 and not has_error then
+
+    if #err_lines > 0 then
+        print("Error from pandoc: ", table.concat(err_lines, "\n"))
+    end
+
+    if #result_lines > 0 then
         return table.concat(result_lines, "\n")
     else
-        -- Fallback to simple processing if pandoc failed
+        print("Pandoc failed to process LaTeX text. Falling back to simple processing.")
         return M.process_latex_simple(text)
     end
 end
@@ -248,9 +240,9 @@ M.process_text = function(text, filetype, config)
     if not config.remove_syntax then
         return text
     end
-    
+
     local method = config.syntax_removal_method or "treesitter"
-    
+
     if filetype == "markdown" then
         if method == "pandoc" then
             return M.process_markdown_pandoc(text)
@@ -264,7 +256,7 @@ M.process_text = function(text, filetype, config)
             return M.process_latex_treesitter(text)
         end
     end
-    
+
     return text
 end
 
