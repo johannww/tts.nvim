@@ -9,6 +9,8 @@ https://github.com/user-attachments/assets/f331db4b-ace3-475d-8423-e5e3df81083b
 
 # Dependencies
 
+## Required
+
 - ffplay
 ```bash
 sudo apt install ffmpeg
@@ -25,6 +27,36 @@ yay -S python-edge-tts
 ```
 - plenary.nvim
 
+## Optional (for syntax removal)
+
+- **pandoc**: For pandoc-based syntax removal. Only required if using `syntax_removal_method = "pandoc"`.
+```bash
+sudo apt install pandoc
+```
+```bash
+sudo pacman -S pandoc
+```
+
+# Features
+
+## Syntax Removal
+
+The plugin can remove syntax from Markdown and LaTeX files before reading them aloud. This ensures that the TTS engine speaks only the actual text content, without markup symbols like `#`, `*`, `\textbf{}`, etc.
+
+Two methods are supported:
+
+1. **Simple** (default): Uses pattern-based regex to remove common markdown and LaTeX syntax. Works without any external dependencies.
+2. **Pandoc**: Uses pandoc to convert Markdown/LaTeX to plain text. Requires pandoc to be installed. Falls back to simple method if pandoc fails.
+
+To enable syntax removal, set `remove_syntax = true` in your configuration:
+
+```lua
+require("tts-nvim").setup({
+    remove_syntax = true,
+    syntax_removal_method = "pandoc", -- or "simple"
+})
+```
+
 # Installation
 
 Lazy:
@@ -37,6 +69,8 @@ Lazy:
     opts = {
         language = "en",
         speed = 1.0,
+        remove_syntax = false, -- Enable syntax removal for Markdown and LaTeX
+        syntax_removal_method = "pandoc", -- "simple" (pattern-based) or "pandoc" (requires pandoc)
         language_to_voice = {
             ["en"] = "en-GB-SoniaNeural",
             ["pt"] = "pt-BR-AntonioNeural",
