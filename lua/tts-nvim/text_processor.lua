@@ -3,6 +3,9 @@ local Job = require("plenary.job")
 
 -- Simple pattern-based markdown cleanup
 M.process_markdown_simple = function(text)
+    -- Remove HTML tags (do this first to handle <a>, <img>, etc.)
+    text = text:gsub("<[^>]+>", "")
+    
     -- Remove heading markers
     text = text:gsub("^#+%s+", "")
     text = text:gsub("\n#+%s+", "\n")
@@ -80,17 +83,23 @@ M.process_markdown_treesitter = function(text)
     local function extract_text(node)
         local node_type = node:type()
 
-        -- Skip certain node types
+        -- Skip certain node types (including HTML tags)
         if node_type == "code_fence_delimiter" or 
            node_type == "fenced_code_block_delimiter" or
-           node_type == "info_string" then
+           node_type == "info_string" or
+           node_type == "html_tag" or
+           node_type == "html_block" or
+           node_type:match("^html_") then
             return
         end
 
         if node:child_count() == 0 then
             local text_content = vim.treesitter.get_node_text(node, buf)
             if text_content and text_content:match("%S") then
-                table.insert(result, text_content)
+                -- Additional check to skip anything that looks like HTML
+                if not text_content:match("^<") then
+                    table.insert(result, text_content)
+                end
             end
         else
             for child in node:iter_children() do
