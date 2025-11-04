@@ -6,6 +6,9 @@ M.opts = {
     speed = 1.0,
     remove_syntax = false, -- Enable syntax removal for supported filetypes
     syntax_removal_method = "pandoc", -- "simple" (pattern-based) or "pandoc"
+    backend = "edge", -- TTS backend: "edge", "piper", or "openai"
+    
+    -- Edge TTS configuration
     languages_to_voice = {
         ["en"] = "en-GB-SoniaNeural",
         ["pt"] = "pt-BR-AntonioNeural",
@@ -15,7 +18,15 @@ M.opts = {
         ["it"] = "it-IT-ElsaNeural",
         ["ja"] = "ja-JP-NanamiNeural",
         ["zh"] = "zh-CN-XiaoxiaoNeural",
-    }
+    },
+    
+    -- Piper configuration
+    piper_model = "en_US-lessac-medium", -- Piper model to use
+    
+    -- OpenAI TTS configuration
+    openai_voice = "alloy", -- OpenAI voice: "alloy", "echo", "fable", "onyx", "nova", "shimmer"
+    openai_model = "tts-1", -- OpenAI model: "tts-1" or "tts-1-hd"
+    openai_api_key = nil, -- OpenAI API key (or use OPENAI_API_KEY env variable)
 }
 
 M.setup_config = function(opts)

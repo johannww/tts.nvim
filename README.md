@@ -1,6 +1,6 @@
 # Text-to-speech in Neovim
 
-Read your visual selection using the [edge-tts](https://github.com/rany2/edge-tts) python library.
+Read your visual selection using multiple TTS backends including [edge-tts](https://github.com/rany2/edge-tts), [Piper](https://github.com/rhasspy/piper), and [OpenAI TTS](https://platform.openai.com/docs/guides/text-to-speech).
 
 "TTS" command reads the visual selection using `ffplay`, while "TTSFile" outputs the audio to a file.
 
@@ -9,7 +9,7 @@ https://github.com/user-attachments/assets/f331db4b-ace3-475d-8423-e5e3df81083b
 
 # Dependencies
 
-## Required
+## Required (All backends)
 
 - ffplay
 ```bash
@@ -18,6 +18,11 @@ sudo apt install ffmpeg
 ```bash
 sudo pacman -S ffmpeg
 ```
+- plenary.nvim
+
+## Backend-specific Dependencies
+
+### Edge TTS (default backend)
 - edge-tts
 ```bash
 pip install edge-tts
@@ -25,7 +30,20 @@ pip install edge-tts
 ```bash
 yay -S python-edge-tts
 ```
-- plenary.nvim
+
+### Piper
+- piper-tts
+```bash
+pip install piper-tts
+```
+Or install from source: [Piper Installation](https://github.com/rhasspy/piper#installation)
+
+### OpenAI TTS
+- openai Python package
+```bash
+pip install openai
+```
+- OpenAI API key (set as `OPENAI_API_KEY` environment variable or in config)
 
 ## Optional (for syntax removal)
 
@@ -38,6 +56,22 @@ sudo pacman -S pandoc
 ```
 
 # Features
+
+## Multiple TTS Backends
+
+The plugin supports three TTS backends:
+
+1. **Edge TTS** (default): Free, cloud-based Microsoft Edge TTS with many voices
+2. **Piper**: Fast, local, open-source neural TTS
+3. **OpenAI TTS**: High-quality cloud-based TTS (requires API key)
+
+Configure the backend in your setup:
+
+```lua
+require("tts-nvim").setup({
+    backend = "edge", -- "edge", "piper", or "openai"
+})
+```
 
 ## Syntax Removal
 
@@ -59,7 +93,9 @@ require("tts-nvim").setup({
 
 # Installation
 
-Lazy:
+## Lazy
+
+### Edge TTS (default)
 
 ```lua
 {
@@ -67,11 +103,12 @@ Lazy:
     cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
+        backend = "edge", -- default backend
         language = "en",
         speed = 1.0,
-        remove_syntax = false, -- Enable syntax removal for Markdown and LaTeX
-        syntax_removal_method = "pandoc", -- "simple" (pattern-based) or "pandoc" (requires pandoc)
-        language_to_voice = {
+        remove_syntax = false,
+        syntax_removal_method = "pandoc",
+        languages_to_voice = {
             ["en"] = "en-GB-SoniaNeural",
             ["pt"] = "pt-BR-AntonioNeural",
             ["es"] = "es-ES-ElviraNeural",
@@ -82,11 +119,46 @@ Lazy:
             ["zh"] = "zh-CN-XiaoxiaoNeural",
         },
     },
-},
-
+}
 ```
 
-## List voices
+### Piper
+
+```lua
+{
+    "johannww/tts.nvim",
+    cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+        backend = "piper",
+        language = "en",
+        speed = 1.0,
+        piper_model = "en_US-lessac-medium", -- or other Piper models
+    },
+}
+```
+
+### OpenAI TTS
+
+```lua
+{
+    "johannww/tts.nvim",
+    cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+        backend = "openai",
+        language = "en",
+        speed = 1.0,
+        openai_model = "tts-1", -- or "tts-1-hd" for higher quality
+        openai_voice = "alloy", -- "alloy", "echo", "fable", "onyx", "nova", "shimmer"
+        openai_api_key = nil, -- or set OPENAI_API_KEY environment variable
+    },
+}
+```
+
+## Backend-Specific Configuration
+
+### Edge TTS - List Available Voices
 
 ```bash
 python -m edge_tts --list-voices
@@ -428,3 +500,35 @@ zu-ZA-ThandoNeural
 ```
 
 </details>
+
+### Piper - Available Models
+
+Piper models need to be downloaded before use. See [Piper documentation](https://github.com/rhasspy/piper/blob/master/VOICES.md) for a full list of available voices.
+
+Common models:
+- `en_US-lessac-medium` (default, good quality)
+- `en_US-lessac-high` (higher quality, slower)
+- `en_GB-alan-medium` (British English)
+- `en_US-amy-medium` (Female voice)
+
+Download models:
+```bash
+piper --download-dir ~/.local/share/piper --model en_US-lessac-medium
+```
+
+### OpenAI TTS - Available Voices
+
+OpenAI TTS offers 6 voices with different characteristics:
+
+- **alloy**: Neutral and balanced
+- **echo**: Male, clear and articulate
+- **fable**: British accent, expressive
+- **onyx**: Deep male voice
+- **nova**: Female, warm and engaging
+- **shimmer**: Female, soft and gentle
+
+Models:
+- `tts-1`: Standard quality, faster
+- `tts-1-hd`: Higher quality, slightly slower
+
+No pre-download required - voices are accessed via API.
