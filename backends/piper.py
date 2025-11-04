@@ -40,24 +40,23 @@ def stream_audio():
     
     if to_file:
         # Generate audio to file
-        with open(to_file, "wb") as f:
-            piper_proc = subprocess.Popen(
-                ["piper", "--model", model, "--length_scale", str(length_scale), "--output-raw"],
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL
-            )
-            piper_proc.stdin.write(text.encode())
-            piper_proc.stdin.close()
-            
-            # Convert raw audio to mp3 using ffmpeg
-            ffmpeg_proc = subprocess.Popen(
-                ["ffmpeg", "-f", "s16le", "-ar", "22050", "-ac", "1", "-i", "-", "-y", to_file],
-                stdin=piper_proc.stdout,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL
-            )
-            ffmpeg_proc.wait()
+        piper_proc = subprocess.Popen(
+            ["piper", "--model", model, "--length_scale", str(length_scale), "--output-raw"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL
+        )
+        piper_proc.stdin.write(text.encode())
+        piper_proc.stdin.close()
+        
+        # Convert raw audio to mp3 using ffmpeg
+        ffmpeg_proc = subprocess.Popen(
+            ["ffmpeg", "-f", "s16le", "-ar", "22050", "-ac", "1", "-i", "-", "-y", to_file],
+            stdin=piper_proc.stdout,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        ffmpeg_proc.wait()
     else:
         # Stream audio to ffplay
         piper_proc = subprocess.Popen(

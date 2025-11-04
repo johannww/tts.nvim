@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import os,threading,subprocess
-import time
+import os
+import subprocess
 
 import edge_tts
 import asyncio
@@ -34,7 +34,7 @@ def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
 
 async def stream_audio():
     kill_existing_process()
-    ffplay = subprocess.Popen(["ffplay", "-i", "-", "-autoexit"],
+    ffplay = subprocess.Popen(["ffplay", "-i", "-", "-autoexit", "-nodisp"],
                               stdin=subprocess.PIPE, start_new_session=True,
                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     thispid = os.getpid()

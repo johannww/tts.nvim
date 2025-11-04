@@ -1,1 +1,12 @@
+# TTS.nvim Python Dependencies
+# Install the backend(s) you want to use
+
+# Edge TTS (default backend)
 edge-tts
+
+# Piper TTS (optional)
+# piper-tts
+
+# OpenAI TTS (optional)
+# openai
+
