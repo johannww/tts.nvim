@@ -8,6 +8,7 @@ local nvimDataDir = vim.fn.stdpath("data") .. "/tts-nvim/"
 M.tts = function()
     local lines, coords = util.getVisualSelection()
     local search_string = util.getTextFromSelection(lines, coords)
+    search_string = util.processText(search_string)
 
     local pythonScriptPath = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "tts.py")
     local voice = config.opts.languages_to_voice[config.opts.language]
@@ -27,6 +28,7 @@ end
 M.tts_to_file = function()
     local lines, coords = util.getVisualSelection()
     local search_string = util.getTextFromSelection(lines, coords)
+    search_string = util.processText(search_string)
 
     local pythonScriptPath = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "tts.py")
     local voice = config.opts.languages_to_voice[config.opts.language]

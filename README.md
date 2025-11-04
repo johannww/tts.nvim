@@ -25,6 +25,26 @@ yay -S python-edge-tts
 ```
 - plenary.nvim
 
+# Features
+
+## Syntax Removal
+
+The plugin can remove syntax from Markdown and LaTeX files before reading them aloud. This ensures that the TTS engine speaks only the actual text content, without markup symbols like `#`, `*`, `\textbf{}`, etc.
+
+Two methods are supported:
+
+1. **Treesitter** (default): Uses Neovim's treesitter to parse the document and extract text content. Falls back to simple pattern-based removal if treesitter is unavailable.
+2. **Pandoc**: Uses pandoc to convert Markdown/LaTeX to plain text. Requires pandoc to be installed.
+
+To enable syntax removal, set `remove_syntax = true` in your configuration:
+
+```lua
+require("tts-nvim").setup({
+    remove_syntax = true,
+    syntax_removal_method = "treesitter", -- or "pandoc"
+})
+```
+
 # Installation
 
 Lazy:
@@ -37,6 +57,8 @@ Lazy:
     opts = {
         language = "en",
         speed = 1.0,
+        remove_syntax = false, -- Enable syntax removal for Markdown and LaTeX
+        syntax_removal_method = "treesitter", -- "treesitter" or "pandoc"
         language_to_voice = {
             ["en"] = "en-GB-SoniaNeural",
             ["pt"] = "pt-BR-AntonioNeural",

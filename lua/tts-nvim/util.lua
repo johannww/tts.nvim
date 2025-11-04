@@ -35,4 +35,12 @@ M.getTextFromSelection = function(lines, coords)
     return search_string
 end
 
+M.processText = function(text)
+    local text_processor = require("tts-nvim.text_processor")
+    local config = require("tts-nvim.config")
+    local filetype = vim.bo.filetype
+    
+    return text_processor.process_text(text, filetype, config.opts)
+end
+
 return M
