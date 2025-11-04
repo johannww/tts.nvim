@@ -9,6 +9,8 @@ https://github.com/user-attachments/assets/f331db4b-ace3-475d-8423-e5e3df81083b
 
 # Dependencies
 
+## Required
+
 - ffplay
 ```bash
 sudo apt install ffmpeg
@@ -24,6 +26,17 @@ pip install edge-tts
 yay -S python-edge-tts
 ```
 - plenary.nvim
+
+## Optional (for syntax removal)
+
+- **nvim-treesitter** (recommended): For treesitter-based syntax removal. If unavailable, falls back to pattern-based removal.
+- **pandoc**: For pandoc-based syntax removal. Only required if using `syntax_removal_method = "pandoc"`.
+```bash
+sudo apt install pandoc
+```
+```bash
+sudo pacman -S pandoc
+```
 
 # Features
 
@@ -58,7 +71,7 @@ Lazy:
         language = "en",
         speed = 1.0,
         remove_syntax = false, -- Enable syntax removal for Markdown and LaTeX
-        syntax_removal_method = "treesitter", -- "treesitter" or "pandoc"
+        syntax_removal_method = "treesitter", -- "treesitter" (optional, falls back to regex) or "pandoc" (requires pandoc)
         language_to_voice = {
             ["en"] = "en-GB-SoniaNeural",
             ["pt"] = "pt-BR-AntonioNeural",
