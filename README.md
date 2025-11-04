@@ -100,7 +100,7 @@ require("tts-nvim").setup({
 ```lua
 {
     "johannww/tts.nvim",
-    cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
+    cmd = { "TTS", "TTSFile", "TTSSetLanguage", "TTSSetBackend" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
         backend = "edge", -- default backend
@@ -127,7 +127,7 @@ require("tts-nvim").setup({
 ```lua
 {
     "johannww/tts.nvim",
-    cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
+    cmd = { "TTS", "TTSFile", "TTSSetLanguage", "TTSSetBackend" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
         backend = "piper",
@@ -143,7 +143,7 @@ require("tts-nvim").setup({
 ```lua
 {
     "johannww/tts.nvim",
-    cmd = { "TTS", "TTSFile", "TTSSetLanguage" },
+    cmd = { "TTS", "TTSFile", "TTSSetLanguage", "TTSSetBackend" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
         backend = "openai",
@@ -532,3 +532,27 @@ Models:
 - `tts-1-hd`: Higher quality, slightly slower
 
 No pre-download required - voices are accessed via API.
+
+# Usage
+
+## Commands
+
+The plugin provides the following commands:
+
+- **`:TTS`** - Read the visual selection aloud using the configured backend
+- **`:TTSFile`** - Save the visual selection as an audio file (tts.mp3)
+- **`:TTSSetLanguage <lang>`** - Set the language for TTS (e.g., `:TTSSetLanguage en`)
+- **`:TTSSetBackend <backend>`** - Switch TTS backend (e.g., `:TTSSetBackend piper`)
+
+## Example Workflow
+
+1. Select text in visual mode
+2. Run `:TTS` to hear it spoken
+3. Or run `:TTSFile` to save it as an audio file
+
+To switch backends during a session:
+```vim
+:TTSSetBackend piper
+:TTSSetBackend openai
+:TTSSetBackend edge
+```

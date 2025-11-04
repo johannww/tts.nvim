@@ -76,14 +76,34 @@ end
 
 M.tts_set_language = function(args)
     local lang = args.fargs[1]
-    local voice = config.opts.languages_to_voice[lang]
-    if voice ~= nil then
-        config.opts.voice = voice
-        config.opts.language = lang
-        print("TTS language set to " .. lang .. " with voice " .. voice)
+    if config.opts.backend == "edge" then
+        local voice = config.opts.languages_to_voice[lang]
+        if voice ~= nil then
+            config.opts.voice = voice
+            config.opts.language = lang
+            print("TTS language set to " .. lang .. " with voice " .. voice)
+        else
+            print("Language " .. lang .. " not supported.")
+        end
     else
-        print("Language " .. lang .. " not supported.")
+        config.opts.language = lang
+        print("TTS language set to " .. lang)
     end
+end
+
+M.tts_set_backend = function(args)
+    local backend_name = args.fargs[1]
+    local backend = backends.get_backend(backend_name)
+    if backend then
+        config.opts.backend = backend_name
+        print("TTS backend set to " .. backend_name)
+    else
+        print("Error: Unknown backend '" .. backend_name .. "'. Available backends: " .. table.concat(backends.get_available_backends(), ", "))
+    end
+end
+
+M.get_available_backends = function()
+    return backends.get_available_backends()
 end
 
 M.get_supported_languages = function()
