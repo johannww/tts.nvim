@@ -30,17 +30,18 @@ end
 
 -- Simple pattern-based LaTeX cleanup
 M.process_latex_simple = function(text)
-    -- Remove common LaTeX commands
-    text = text:gsub("\\[a-zA-Z]+%*?%s*", "")
+    -- Remove percent comments (must be done first to avoid processing commented commands)
+    text = text:gsub("%%[^\n]*", "")
+    
+    -- Remove common LaTeX commands (with optional star and followed by space or brace)
+    text = text:gsub("\\[a-zA-Z]+%*?[%s{]", " ")
+    text = text:gsub("\\[a-zA-Z]+%*?$", "")
     
     -- Remove braces that are left over
     text = text:gsub("[{}]", "")
     
     -- Remove dollar signs for math mode
     text = text:gsub("%$", "")
-    
-    -- Remove percent comments
-    text = text:gsub("%%.-\n", "\n")
     
     return text
 end
@@ -175,6 +176,7 @@ end
 -- Remove markdown syntax using pandoc
 M.process_markdown_pandoc = function(text)
     local result_lines = {}
+    local has_error = false
     
     local job = Job:new({
         command = "pandoc",
@@ -184,15 +186,24 @@ M.process_markdown_pandoc = function(text)
             table.insert(result_lines, data)
         end,
         on_stderr = function(_, data)
-            -- Ignore stderr
+            has_error = true
+            vim.schedule(function()
+                vim.notify("TTS pandoc error: " .. data, vim.log.levels.WARN)
+            end)
+        end,
+        on_exit = function(_, code)
+            if code ~= 0 then
+                has_error = true
+            end
         end,
     })
     
     job:sync()
     
-    if #result_lines > 0 then
+    if #result_lines > 0 and not has_error then
         return table.concat(result_lines, "\n")
     else
+        -- Fallback to simple processing if pandoc failed
         return M.process_markdown_simple(text)
     end
 end
@@ -200,6 +211,7 @@ end
 -- Remove LaTeX syntax using pandoc
 M.process_latex_pandoc = function(text)
     local result_lines = {}
+    local has_error = false
     
     local job = Job:new({
         command = "pandoc",
@@ -209,15 +221,24 @@ M.process_latex_pandoc = function(text)
             table.insert(result_lines, data)
         end,
         on_stderr = function(_, data)
-            -- Ignore stderr
+            has_error = true
+            vim.schedule(function()
+                vim.notify("TTS pandoc error: " .. data, vim.log.levels.WARN)
+            end)
+        end,
+        on_exit = function(_, code)
+            if code ~= 0 then
+                has_error = true
+            end
         end,
     })
     
     job:sync()
     
-    if #result_lines > 0 then
+    if #result_lines > 0 and not has_error then
         return table.concat(result_lines, "\n")
     else
+        -- Fallback to simple processing if pandoc failed
         return M.process_latex_simple(text)
     end
 end
