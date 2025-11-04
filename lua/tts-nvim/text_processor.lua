@@ -1,4 +1,5 @@
 local M = {}
+local Job = require("plenary.job")
 
 -- Simple pattern-based markdown cleanup
 M.process_markdown_simple = function(text)
@@ -54,7 +55,7 @@ M.process_markdown_treesitter = function(text)
     -- Create a temporary buffer to parse the text
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(text, "\n"))
-    vim.api.nvim_buf_set_option(buf, "filetype", "markdown")
+    vim.bo[buf].filetype = "markdown"
     
     -- Get the parser
     local ok, parser = pcall(vim.treesitter.get_parser, buf, "markdown")
@@ -121,7 +122,7 @@ M.process_latex_treesitter = function(text)
     -- Create a temporary buffer to parse the text
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(text, "\n"))
-    vim.api.nvim_buf_set_option(buf, "filetype", "tex")
+    vim.bo[buf].filetype = "tex"
     
     -- Get the parser
     local ok, parser = pcall(vim.treesitter.get_parser, buf, "latex")
@@ -173,7 +174,6 @@ end
 
 -- Remove markdown syntax using pandoc
 M.process_markdown_pandoc = function(text)
-    local Job = require("plenary.job")
     local result_lines = {}
     
     local job = Job:new({
@@ -199,7 +199,6 @@ end
 
 -- Remove LaTeX syntax using pandoc
 M.process_latex_pandoc = function(text)
-    local Job = require("plenary.job")
     local result_lines = {}
     
     local job = Job:new({
