@@ -133,6 +133,7 @@ require("tts-nvim").setup({
             -- Configure the voice in openai_voice option below
         },
         openai_voice = "alloy",  -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
+        openai_model = "tts-1", -- OpenAI model: "tts-1" or "tts-1-hd"
     },
 }
 ```
@@ -527,10 +528,7 @@ Common models:
 - `en_GB-alan-medium` (British English)
 - `en_US-amy-medium` (Female voice)
 
-Download models:
-```bash
-piper --download-dir ~/.local/share/piper --model en_US-lessac-medium
-```
+Models are downloaded automatically to the nvim data directory (`~/.local/share/nvim/tts-nvim/piper_voices/`).
 
 ### OpenAI TTS - Available Voices
 
