@@ -74,7 +74,7 @@ def generate_audio():
 
             # Play the audio with ffplay
             ffplay_proc = subprocess.Popen(
-                ["ffplay", "-i", tmp_filename, "-autoexit", "-nodisp"],
+                ["ffplay", "-i", tmp_filename, "-autoexit"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 start_new_session=True,

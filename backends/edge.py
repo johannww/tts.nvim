@@ -38,7 +38,7 @@ def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
 async def stream_audio():
     kill_existing_process()
     ffplay = subprocess.Popen(
-        ["ffplay", "-i", "-", "-autoexit", "-nodisp"],
+        ["ffplay", "-i", "-", "-autoexit"],
         stdin=subprocess.PIPE,
         start_new_session=True,
         stdout=subprocess.DEVNULL,
