@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import piper
+import wave
 
 text = sys.argv[1]
 model = sys.argv[2]
@@ -44,16 +45,12 @@ def stream_audio():
     syn_config = piper.SynthesisConfig(length_scale=length_scale, normalize_audio=True)
     model_path = os.path.join(voices_dir, model + ".onnx")
     voice = piper.PiperVoice.load(model_path=model_path)
-    iterable = voice.synthesize(text, syn_config=syn_config)
 
-    # TODO: Fix to_file logic. We nede to convert raw audio to .wav or .flac or mp3
     if to_file:
-        open(to_file, "wb").close()  # Clear existing file
-        for chunk in iterable:
-            raw_audio_data = chunk.audio_int16_bytes
-            with open(to_file, "ab") as f:
-                f.write(raw_audio_data)
+        with wave.open(to_file, "wb") as wav_file:
+            voice.synthesize_wav(text=text, wav_file=wav_file, syn_config=syn_config)
     else:
+        iterable = voice.synthesize(text, syn_config=syn_config)
         ffplay_proc = subprocess.Popen(
             [
                 "ffplay",

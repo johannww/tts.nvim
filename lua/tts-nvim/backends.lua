@@ -70,6 +70,7 @@ M.backends.piper = {
         end
         local args = { text, model, tostring(config.speed), nvim_data_dir }
         if to_file then
+            to_file = to_file:gsub("%.mp3$", ".wav")
             table.insert(args, to_file)
         end
         return args
