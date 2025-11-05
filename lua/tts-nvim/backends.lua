@@ -17,7 +17,14 @@ M.backends.edge = {
     end,
     
     get_args = function(text, config, nvim_data_dir, to_file)
-        local voice = config.languages_to_voice[config.language]
+        local voice
+        if config.languages_to_voice and config.languages_to_voice.edge then
+            voice = config.languages_to_voice.edge[config.language]
+        end
+        -- Fallback to flat structure for backward compatibility
+        if not voice and config.languages_to_voice then
+            voice = config.languages_to_voice[config.language]
+        end
         local args = {text, voice, tostring(config.speed), nvim_data_dir}
         if to_file then
             table.insert(args, to_file)
@@ -29,7 +36,13 @@ M.backends.edge = {
         if not config.languages_to_voice then
             return false, "languages_to_voice configuration is required for edge backend"
         end
-        local voice = config.languages_to_voice[config.language]
+        local voice
+        if config.languages_to_voice.edge then
+            voice = config.languages_to_voice.edge[config.language]
+        else
+            -- Fallback to flat structure for backward compatibility
+            voice = config.languages_to_voice[config.language]
+        end
         if not voice then
             return false, "No voice configured for language: " .. config.language
         end
@@ -46,7 +59,15 @@ M.backends.piper = {
     end,
     
     get_args = function(text, config, nvim_data_dir, to_file)
-        local model = config.piper_model or "en_US-lessac-medium"
+        local model
+        -- First check for language-specific model
+        if config.languages_to_voice and config.languages_to_voice.piper then
+            model = config.languages_to_voice.piper[config.language]
+        end
+        -- Fallback to piper_model config or default
+        if not model then
+            model = config.piper_model or "en_US-lessac-medium"
+        end
         local args = {text, model, tostring(config.speed), nvim_data_dir}
         if to_file then
             table.insert(args, to_file)
@@ -69,7 +90,15 @@ M.backends.openai = {
     end,
     
     get_args = function(text, config, nvim_data_dir, to_file)
-        local voice = config.openai_voice or "alloy"
+        local voice
+        -- First check for language-specific voice
+        if config.languages_to_voice and config.languages_to_voice.openai then
+            voice = config.languages_to_voice.openai[config.language]
+        end
+        -- Fallback to openai_voice config or default
+        if not voice then
+            voice = config.openai_voice or "alloy"
+        end
         local model = config.openai_model or "tts-1"
         local args = {text, voice, model, tostring(config.speed), nvim_data_dir}
         if to_file then

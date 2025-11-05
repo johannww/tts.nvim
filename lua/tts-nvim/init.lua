@@ -76,18 +76,23 @@ end
 
 M.tts_set_language = function(args)
     local lang = args.fargs[1]
-    if config.opts.backend == "edge" then
-        local voice = config.opts.languages_to_voice[lang]
-        if voice ~= nil then
-            config.opts.voice = voice
-            config.opts.language = lang
-            print("TTS language set to " .. lang .. " with voice " .. voice)
-        else
-            print("Language " .. lang .. " not supported.")
-        end
+    local backend_name = config.opts.backend
+    
+    -- Check if language is supported in the current backend
+    local voice
+    if config.opts.languages_to_voice and config.opts.languages_to_voice[backend_name] then
+        voice = config.opts.languages_to_voice[backend_name][lang]
+    elseif config.opts.languages_to_voice then
+        -- Fallback to flat structure for backward compatibility
+        voice = config.opts.languages_to_voice[lang]
+    end
+    
+    if voice then
+        config.opts.language = lang
+        print("TTS language set to " .. lang .. " (" .. backend_name .. " backend: " .. voice .. ")")
     else
         config.opts.language = lang
-        print("TTS language set to " .. lang)
+        print("TTS language set to " .. lang .. " (no specific voice mapping for " .. backend_name .. " backend)")
     end
 end
 
@@ -108,9 +113,29 @@ end
 
 M.get_supported_languages = function()
     local languages = {}
-    for lang, _ in pairs(config.opts.languages_to_voice) do
-        table.insert(languages, lang)
+    local seen = {}
+    
+    -- Collect languages from current backend
+    local backend_name = config.opts.backend
+    if config.opts.languages_to_voice and config.opts.languages_to_voice[backend_name] then
+        for lang, _ in pairs(config.opts.languages_to_voice[backend_name]) do
+            if not seen[lang] then
+                table.insert(languages, lang)
+                seen[lang] = true
+            end
+        end
     end
+    
+    -- Also add languages from flat structure for backward compatibility
+    if config.opts.languages_to_voice then
+        for lang, voice in pairs(config.opts.languages_to_voice) do
+            if type(voice) == "string" and not seen[lang] then
+                table.insert(languages, lang)
+                seen[lang] = true
+            end
+        end
+    end
+    
     return languages
 end
 
