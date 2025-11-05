@@ -13,7 +13,7 @@ M.backends.edge = {
     name = "edge",
     
     get_script_path = function(plugin_dir)
-        return plugin_dir .. "/backends/edge_tts.py"
+        return plugin_dir .. "/backends/edge.py"
     end,
     
     get_args = function(text, config, nvim_data_dir, to_file)
