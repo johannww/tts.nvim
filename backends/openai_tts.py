@@ -7,10 +7,12 @@ import tempfile
 text = sys.argv[1]
 voice = sys.argv[2]
 model = sys.argv[3]
-api_key = sys.argv[4]
-speed = float(sys.argv[5])
-nvim_data_dir = sys.argv[6]
-to_file = sys.argv[7] if len(sys.argv) > 7 else None
+speed = float(sys.argv[4])
+nvim_data_dir = sys.argv[5]
+to_file = sys.argv[6] if len(sys.argv) > 6 else None
+
+# Get API key from environment variable
+api_key = os.getenv("OPENAI_API_KEY")
 
 pid_file = os.path.join(nvim_data_dir, "pid.txt")
 

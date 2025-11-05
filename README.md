@@ -43,7 +43,7 @@ Or install from source: [Piper Installation](https://github.com/rhasspy/piper#in
 ```bash
 pip install openai
 ```
-- OpenAI API key (set as `OPENAI_API_KEY` environment variable or in config)
+- OpenAI API key (set as `OPENAI_API_KEY` environment variable)
 
 ## Optional (for syntax removal)
 
@@ -140,6 +140,8 @@ require("tts-nvim").setup({
 
 ### OpenAI TTS
 
+**Note:** OpenAI TTS requires the `OPENAI_API_KEY` environment variable to be set.
+
 ```lua
 {
     "johannww/tts.nvim",
@@ -151,7 +153,6 @@ require("tts-nvim").setup({
         speed = 1.0,
         openai_model = "tts-1", -- or "tts-1-hd" for higher quality
         openai_voice = "alloy", -- "alloy", "echo", "fable", "onyx", "nova", "shimmer"
-        openai_api_key = nil, -- or set OPENAI_API_KEY environment variable
     },
 }
 ```

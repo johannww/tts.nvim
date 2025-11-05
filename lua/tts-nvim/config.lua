@@ -24,9 +24,9 @@ M.opts = {
     piper_model = "en_US-lessac-medium", -- Piper model to use
     
     -- OpenAI TTS configuration
+    -- Note: API key must be set via OPENAI_API_KEY environment variable
     openai_voice = "alloy", -- OpenAI voice: "alloy", "echo", "fable", "onyx", "nova", "shimmer"
     openai_model = "tts-1", -- OpenAI model: "tts-1" or "tts-1-hd"
-    openai_api_key = nil, -- OpenAI API key (or use OPENAI_API_KEY env variable)
 }
 
 M.setup_config = function(opts)

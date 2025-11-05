@@ -71,9 +71,7 @@ M.backends.openai = {
     get_args = function(text, config, nvim_data_dir, to_file)
         local voice = config.openai_voice or "alloy"
         local model = config.openai_model or "tts-1"
-        local api_key = config.openai_api_key or os.getenv("OPENAI_API_KEY")
-        -- Pass empty string if no API key to allow Python script to handle the error
-        local args = {text, voice, model, api_key or "", tostring(config.speed), nvim_data_dir}
+        local args = {text, voice, model, tostring(config.speed), nvim_data_dir}
         if to_file then
             table.insert(args, to_file)
         end
@@ -81,9 +79,9 @@ M.backends.openai = {
     end,
     
     validate_config = function(config)
-        local api_key = config.openai_api_key or os.getenv("OPENAI_API_KEY")
+        local api_key = os.getenv("OPENAI_API_KEY")
         if not api_key or api_key == "" then
-            return false, "OpenAI API key is required. Set openai_api_key in config or OPENAI_API_KEY environment variable"
+            return false, "OpenAI API key is required. Set OPENAI_API_KEY environment variable"
         end
         return true
     end
