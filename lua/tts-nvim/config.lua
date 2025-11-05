@@ -41,9 +41,10 @@ M.opts = {
 
     -- OpenAI TTS configuration
     -- Note: API key must be set via OPENAI_API_KEY environment variable
-    -- Available voices: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
-    openai_voice = "alloy",
-    openai_model = "tts-1", -- OpenAI model: "tts-1" or "tts-1-hd"
+    openai = {
+        voice = "alloy", -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
+        model = "tts-1", -- "tts-1" or "tts-1-hd"
+    },
 }
 
 M.setup_config = function(opts)

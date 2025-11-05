@@ -128,10 +128,12 @@ require("tts-nvim").setup({
                 ["zh"] = "zh_CN-huayan-medium",
             },
             -- OpenAI uses the same voice for all languages
-            -- Configure the voice in openai_voice option below
+            -- Configure in openai option below
         },
-        openai_voice = "alloy",  -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
-        openai_model = "tts-1", -- OpenAI model: "tts-1" or "tts-1-hd"
+        openai = {
+            voice = "alloy", -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
+            model = "tts-1", -- "tts-1" or "tts-1-hd"
+        },
     },
 }
 ```

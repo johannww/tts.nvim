@@ -92,8 +92,8 @@ M.backends.openai = {
 
     get_args = function(text, config, nvim_data_dir, to_file)
         -- OpenAI uses the same voice for all languages
-        local voice = config.openai_voice or "alloy"
-        local model = config.openai_model or "tts-1"
+        local voice = (config.openai and config.openai.voice) or "alloy"
+        local model = (config.openai and config.openai.model) or "tts-1"
         local args = { text, voice, model, tostring(config.speed), nvim_data_dir }
         if to_file then
             table.insert(args, to_file)
