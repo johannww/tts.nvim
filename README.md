@@ -129,17 +129,10 @@ require("tts-nvim").setup({
                 ["ja"] = "ja_JP-haruka-medium",
                 ["zh"] = "zh_CN-huayan-medium",
             },
-            openai = {
-                ["en"] = "alloy",
-                ["pt"] = "alloy",
-                ["es"] = "alloy",
-                ["fr"] = "alloy",
-                ["de"] = "alloy",
-                ["it"] = "alloy",
-                ["ja"] = "alloy",
-                ["zh"] = "alloy",
-            },
+            -- OpenAI uses the same voice for all languages
+            -- Configure the voice in openai_voice option below
         },
+        openai_voice = "alloy",  -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
     },
 }
 ```
@@ -174,7 +167,7 @@ require("tts-nvim").setup({
         language = "en",
         speed = 1.0,
         openai_model = "tts-1", -- or "tts-1-hd" for higher quality
-        openai_voice = "alloy", -- "alloy", "echo", "fable", "onyx", "nova", "shimmer"
+        openai_voice = "alloy", -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
     },
 }
 ```
@@ -541,13 +534,17 @@ piper --download-dir ~/.local/share/piper --model en_US-lessac-medium
 
 ### OpenAI TTS - Available Voices
 
-OpenAI TTS offers 6 voices with different characteristics:
+OpenAI TTS offers 10 voices with different characteristics:
 
 - **alloy**: Neutral and balanced
+- **ash**: Clear and articulate
+- **ballad**: Warm and expressive
+- **coral**: Friendly and engaging
 - **echo**: Male, clear and articulate
 - **fable**: British accent, expressive
-- **onyx**: Deep male voice
 - **nova**: Female, warm and engaging
+- **onyx**: Deep male voice
+- **sage**: Wise and measured
 - **shimmer**: Female, soft and gentle
 
 Models:

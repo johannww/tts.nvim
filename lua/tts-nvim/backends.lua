@@ -90,15 +90,8 @@ M.backends.openai = {
     end,
 
     get_args = function(text, config, nvim_data_dir, to_file)
-        local voice
-        -- First check for language-specific voice
-        if config.languages_to_voice and config.languages_to_voice.openai then
-            voice = config.languages_to_voice.openai[config.language]
-        end
-        -- Fallback to openai_voice config or default
-        if not voice then
-            voice = config.openai_voice or "alloy"
-        end
+        -- OpenAI uses the same voice for all languages
+        local voice = config.openai_voice or "alloy"
         local model = config.openai_model or "tts-1"
         local args = { text, voice, model, tostring(config.speed), nvim_data_dir }
         if to_file then

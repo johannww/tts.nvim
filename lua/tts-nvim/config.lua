@@ -32,17 +32,8 @@ M.opts = {
             ["ja"] = "ja_JP-haruka-medium",
             ["zh"] = "zh_CN-huayan-medium",
         },
-        -- OpenAI TTS voices (cloud-based)
-        openai = {
-            ["en"] = "alloy",
-            ["pt"] = "alloy",
-            ["es"] = "alloy",
-            ["fr"] = "alloy",
-            ["de"] = "alloy",
-            ["it"] = "alloy",
-            ["ja"] = "alloy",
-            ["zh"] = "alloy",
-        },
+        -- OpenAI TTS uses the same voice for all languages
+        -- Set the voice in openai_voice option below
     },
 
     -- Piper configuration
@@ -50,7 +41,8 @@ M.opts = {
 
     -- OpenAI TTS configuration
     -- Note: API key must be set via OPENAI_API_KEY environment variable
-    openai_voice = "alloy", -- OpenAI voice: "alloy", "echo", "fable", "onyx", "nova", "shimmer"
+    -- Available voices: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
+    openai_voice = "alloy",
     openai_model = "tts-1", -- OpenAI model: "tts-1" or "tts-1-hd"
 }
 
