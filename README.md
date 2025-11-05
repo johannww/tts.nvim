@@ -95,15 +95,13 @@ require("tts-nvim").setup({
 
 ## Lazy
 
-### Edge TTS (default)
-
 ```lua
 {
     "johannww/tts.nvim",
     cmd = { "TTS", "TTSFile", "TTSSetLanguage", "TTSSetBackend" },
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
-        backend = "edge", -- default backend
+        backend = "edge", -- "edge", "openai", or "piper"
         language = "en",
         speed = 1.0,
         remove_syntax = false,
@@ -134,41 +132,6 @@ require("tts-nvim").setup({
         },
         openai_voice = "alloy",  -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
         openai_model = "tts-1", -- OpenAI model: "tts-1" or "tts-1-hd"
-    },
-}
-```
-
-### Piper
-
-```lua
-{
-    "johannww/tts.nvim",
-    cmd = { "TTS", "TTSFile", "TTSSetLanguage", "TTSSetBackend" },
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {
-        backend = "piper",
-        language = "en",
-        speed = 1.0,
-        piper_model = "en_US-lessac-medium", -- or other Piper models
-    },
-}
-```
-
-### OpenAI TTS
-
-**Note:** OpenAI TTS requires the `OPENAI_API_KEY` environment variable to be set.
-
-```lua
-{
-    "johannww/tts.nvim",
-    cmd = { "TTS", "TTSFile", "TTSSetLanguage", "TTSSetBackend" },
-    dependencies = { "nvim-lua/plenary.nvim" },
-    opts = {
-        backend = "openai",
-        language = "en",
-        speed = 1.0,
-        openai_model = "tts-1", -- or "tts-1-hd" for higher quality
-        openai_voice = "alloy", -- Available: alloy, ash, ballad, coral, echo, fable, nova, onyx, sage, shimmer
     },
 }
 ```
