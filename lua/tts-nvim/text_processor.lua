@@ -5,7 +5,7 @@ local Job = require("plenary.job")
 M.process_markdown_simple = function(text)
     -- Remove HTML tags (do this first to handle <a>, <img>, etc.)
     text = text:gsub("<[^>]+>", "")
-    
+
     -- Remove heading markers
     text = text:gsub("^#+%s+", "")
     text = text:gsub("\n#+%s+", "\n")

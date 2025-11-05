@@ -7,7 +7,7 @@ M.opts = {
     remove_syntax = false, -- Enable syntax removal for supported filetypes
     syntax_removal_method = "pandoc", -- "simple" (pattern-based) or "pandoc"
     backend = "edge", -- TTS backend: "edge", "piper", or "openai"
-    
+
     -- Language to voice mappings per backend
     languages_to_voice = {
         -- Edge TTS voices (400+ available)
@@ -44,10 +44,10 @@ M.opts = {
             ["zh"] = "alloy",
         },
     },
-    
+
     -- Piper configuration
     piper_model = "en_US-lessac-medium", -- Piper model to use
-    
+
     -- OpenAI TTS configuration
     -- Note: API key must be set via OPENAI_API_KEY environment variable
     openai_voice = "alloy", -- OpenAI voice: "alloy", "echo", "fable", "onyx", "nova", "shimmer"

@@ -40,57 +40,57 @@ def generate_audio():
     try:
         from openai import OpenAI
     except ImportError:
-        print("Error: openai package not installed. Install it with: pip install openai", file=sys.stderr)
+        print(
+            "Error: openai package not installed. Install it with: pip install openai",
+            file=sys.stderr,
+        )
         sys.exit(1)
-    
+
     if not api_key:
         print("Error: OpenAI API key not provided", file=sys.stderr)
         sys.exit(1)
-    
+
     client = OpenAI(api_key=api_key)
-    
+
     # OpenAI TTS speed ranges from 0.25 to 4.0
     openai_speed = max(0.25, min(4.0, speed))
-    
+
     try:
         response = client.audio.speech.create(
-            model=model,
-            voice=voice,
-            input=text,
-            speed=openai_speed
+            model=model, voice=voice, input=text, speed=openai_speed
         )
-        
+
         if to_file:
             # Save directly to file
             response.stream_to_file(to_file)
         else:
             # Stream to ffplay
             kill_existing_process()
-            
+
             # Create a temporary file to store the audio
             with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
                 tmp_filename = tmp_file.name
                 response.stream_to_file(tmp_filename)
-            
+
             # Play the audio with ffplay
             ffplay_proc = subprocess.Popen(
                 ["ffplay", "-i", tmp_filename, "-autoexit", "-nodisp"],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
-                start_new_session=True
+                start_new_session=True,
             )
-            
+
             thispid = os.getpid()
             write_pids_to_file(thispid, ffplay_proc.pid)
-            
+
             ffplay_proc.wait()
-            
+
             # Clean up temporary file
             try:
                 os.unlink(tmp_filename)
             except Exception:
                 pass
-                
+
     except Exception as e:
         print(f"Error generating audio: {e}", file=sys.stderr)
         sys.exit(1)

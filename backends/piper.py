@@ -33,51 +33,89 @@ def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
 
 def stream_audio():
     kill_existing_process()
-    
+
     # Adjust speed for piper (piper uses --length-scale, where values < 1.0 = faster, > 1.0 = slower)
     # Convert speed (where 1.0 = normal, 2.0 = 2x faster) to length_scale
     length_scale = 1.0 / speed if speed > 0 else 1.0
-    
+
     if to_file:
         # Generate audio to file
         piper_proc = subprocess.Popen(
-            ["piper", "--model", model, "--length_scale", str(length_scale), "--output-raw"],
+            [
+                "piper",
+                "--model",
+                model,
+                "--length_scale",
+                str(length_scale),
+                "--output-raw",
+            ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.DEVNULL,
         )
         piper_proc.stdin.write(text.encode())
         piper_proc.stdin.close()
-        
+
         # Convert raw audio to mp3 using ffmpeg
         ffmpeg_proc = subprocess.Popen(
-            ["ffmpeg", "-f", "s16le", "-ar", "22050", "-ac", "1", "-i", "-", "-y", to_file],
+            [
+                "ffmpeg",
+                "-f",
+                "s16le",
+                "-ar",
+                "22050",
+                "-ac",
+                "1",
+                "-i",
+                "-",
+                "-y",
+                to_file,
+            ],
             stdin=piper_proc.stdout,
             stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.DEVNULL,
         )
         ffmpeg_proc.wait()
     else:
         # Stream audio to ffplay
         piper_proc = subprocess.Popen(
-            ["piper", "--model", model, "--length_scale", str(length_scale), "--output-raw"],
+            [
+                "piper",
+                "--model",
+                model,
+                "--length_scale",
+                str(length_scale),
+                "--output-raw",
+            ],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
-            start_new_session=True
+            start_new_session=True,
         )
-        
+
         ffplay_proc = subprocess.Popen(
-            ["ffplay", "-f", "s16le", "-ar", "22050", "-ac", "1", "-i", "-", "-autoexit", "-nodisp"],
+            [
+                "ffplay",
+                "-f",
+                "s16le",
+                "-ar",
+                "22050",
+                "-ac",
+                "1",
+                "-i",
+                "-",
+                "-autoexit",
+                "-nodisp",
+            ],
             stdin=piper_proc.stdout,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            start_new_session=True
+            start_new_session=True,
         )
-        
+
         thispid = os.getpid()
         write_pids_to_file(thispid, ffplay_proc.pid)
-        
+
         piper_proc.stdin.write(text.encode())
         piper_proc.stdin.close()
         ffplay_proc.wait()
