@@ -55,11 +55,9 @@ def generate_audio():
     # OpenAI TTS speed ranges from 0.25 to 4.0
     openai_speed = max(0.25, min(4.0, speed))
 
-    try:
-        response = client.audio.speech.create(
-            model=model, voice=voice, input=text, speed=openai_speed
-        )
-
+    with client.audio.speech.with_streaming_response.create(
+        model=model, voice=voice, input=text, speed=openai_speed
+    ) as response:
         if to_file:
             # Save directly to file
             response.stream_to_file(to_file)
@@ -90,10 +88,5 @@ def generate_audio():
                 os.unlink(tmp_filename)
             except Exception:
                 pass
-
-    except Exception as e:
-        print(f"Error generating audio: {e}", file=sys.stderr)
-        sys.exit(1)
-
 
 generate_audio()
