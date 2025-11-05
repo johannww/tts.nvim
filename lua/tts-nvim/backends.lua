@@ -55,7 +55,7 @@ M.backends.piper = {
     name = "piper",
 
     get_script_path = function(plugin_dir)
-        return plugin_dir .. "/backends/piper.py"
+        return plugin_dir .. "/backends/piper_tts.py"
     end,
 
     get_args = function(text, config, nvim_data_dir, to_file)
