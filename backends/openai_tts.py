@@ -85,13 +85,10 @@ def listen_to_stdin():
     while True:
         character = sys.stdin.read(1)
         if character == EOF:
-            print("Received EOF.", file=sys.stderr)
             send_to_file = text[-1] == "F"
             text = text[:-1]
             ex.submit(generate_audio, text, send_to_file)
             text = ""
         text += character
-    print("Stdin closed.", file=sys.stderr)
-
 
 listen_to_stdin()
