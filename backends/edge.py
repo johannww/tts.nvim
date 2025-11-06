@@ -29,7 +29,8 @@ def kill_existing_process():
 
 
 def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
-    lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
+    # lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
+    lines = [f"{ffplay_pid}"]
     with open(pid_file, "w") as f:
         f.writelines(lines)
 
@@ -72,10 +73,13 @@ def listen_to_stdin():
         character = sys.stdin.read(1)
         if character == EOF:
             print("Received EOF.", file=sys.stderr)
-            if to_file:
+            print("text is:", repr(text), file=sys.stderr)
+            send_to_file = text[-1] == "F"
+            text = text[:-1]
+            if send_to_file:
                 asyncio.run(save_to_file(text))
             else:
-                ex.submit(lambda t: asyncio.run(stream_audio(t)), text)
+                asyncio.run(stream_audio(text))
             text = ""
         text += character
     print("Stdin closed.", file=sys.stderr)
