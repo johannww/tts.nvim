@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
+import concurrent.futures
 import os
 import subprocess
 import sys
 import tempfile
 
-text = sys.argv[1]
-voice = sys.argv[2]
-model = sys.argv[3]
-speed = float(sys.argv[4])
-nvim_data_dir = sys.argv[5]
-to_file = sys.argv[6] if len(sys.argv) > 6 else None
+voice = sys.argv[1]
+model = sys.argv[2]
+speed = float(sys.argv[3])
+nvim_data_dir = sys.argv[4]
+to_file = sys.argv[5] if len(sys.argv) > 5 else None
 
 # Get API key from environment variable
 api_key = os.getenv("OPENAI_API_KEY")
@@ -36,7 +36,7 @@ def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
         f.writelines(lines)
 
 
-def generate_audio():
+def generate_audio(text):
     try:
         from openai import OpenAI
     except ImportError:
@@ -89,4 +89,19 @@ def generate_audio():
             except Exception:
                 pass
 
-generate_audio()
+
+def listen_to_stdin():
+    EOF = "\x1A"
+    text = ""
+    ex = concurrent.futures.ThreadPoolExecutor()
+    while True:
+        character = sys.stdin.read(1)
+        if character == EOF:
+            print("Received EOF.", file=sys.stderr)
+            ex.submit(generate_audio, text)
+            text = ""
+        text += character
+    print("Stdin closed.", file=sys.stderr)
+
+
+listen_to_stdin()

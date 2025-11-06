@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 import asyncio
+import concurrent.futures
 import os
 import subprocess
+import sys
 
 import edge_tts
 
-text = os.sys.argv[1]
-voice = os.sys.argv[2]
-rate = int((float(os.sys.argv[3]) - 1) * 100)
-nvim_data_dir = os.sys.argv[4]
-to_file = os.sys.argv[5] if len(os.sys.argv) > 5 else None
+voice = sys.argv[1]
+rate = int((float(sys.argv[2]) - 1) * 100)
+nvim_data_dir = sys.argv[3]
+to_file = sys.argv[4] if len(sys.argv) > 4 else None
 
 pid_file = os.path.join(nvim_data_dir, "pid.txt")
-
-communicate = edge_tts.Communicate(text, voice, rate="+" + str(rate) + "%")
 
 
 def kill_existing_process():
@@ -35,7 +34,9 @@ def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
         f.writelines(lines)
 
 
-async def stream_audio():
+async def stream_audio(text):
+    communicate = edge_tts.Communicate(text, voice, rate="+" + str(rate) + "%")
+    
     kill_existing_process()
     ffplay = subprocess.Popen(
         ["ffplay", "-i", "-", "-autoexit"],
@@ -58,8 +59,26 @@ async def stream_audio():
             pass
 
 
-if to_file:
-    asyncio.run(communicate.save(to_file))
-    exit(0)
+async def save_to_file(text):
+    communicate = edge_tts.Communicate(text, voice, rate="+" + str(rate) + "%")
+    await communicate.save(to_file)
 
-asyncio.run(stream_audio())
+
+def listen_to_stdin():
+    EOF = "\x1A"
+    text = ""
+    ex = concurrent.futures.ThreadPoolExecutor()
+    while True:
+        character = sys.stdin.read(1)
+        if character == EOF:
+            print("Received EOF.", file=sys.stderr)
+            if to_file:
+                asyncio.run(save_to_file(text))
+            else:
+                ex.submit(lambda t: asyncio.run(stream_audio(t)), text)
+            text = ""
+        text += character
+    print("Stdin closed.", file=sys.stderr)
+
+
+listen_to_stdin()

@@ -16,7 +16,7 @@ M.backends.edge = {
         return plugin_dir .. "/backends/edge.py"
     end,
 
-    get_args = function(text, config, nvim_data_dir, to_file)
+    get_args = function(config, nvim_data_dir, to_file)
         local voice
         if config.languages_to_voice and config.languages_to_voice.edge then
             voice = config.languages_to_voice.edge[config.language]
@@ -25,7 +25,7 @@ M.backends.edge = {
         if not voice and config.languages_to_voice then
             voice = config.languages_to_voice[config.language]
         end
-        local args = { text, voice, tostring(config.speed), nvim_data_dir }
+        local args = { voice, tostring(config.speed), nvim_data_dir }
         if to_file then
             table.insert(args, to_file)
         end
@@ -90,11 +90,11 @@ M.backends.openai = {
         return plugin_dir .. "/backends/openai_tts.py"
     end,
 
-    get_args = function(text, config, nvim_data_dir, to_file)
+    get_args = function(config, nvim_data_dir, to_file)
         -- OpenAI uses the same voice for all languages
         local voice = (config.openai and config.openai.voice) or "alloy"
         local model = (config.openai and config.openai.model) or "tts-1"
-        local args = { text, voice, model, tostring(config.speed), nvim_data_dir }
+        local args = { voice, model, tostring(config.speed), nvim_data_dir }
         if to_file then
             table.insert(args, to_file)
         end
