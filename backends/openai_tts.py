@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import tempfile
+
 from openai import OpenAI
 
 voice = sys.argv[1]
@@ -79,7 +80,7 @@ def generate_audio(text, send_to_file=False):
 
 
 def listen_to_stdin():
-    EOF = "\x1A"
+    EOF = "\x1a"
     text = ""
     ex = concurrent.futures.ThreadPoolExecutor()
     while True:
@@ -90,5 +91,6 @@ def listen_to_stdin():
             ex.submit(generate_audio, text, send_to_file)
             text = ""
         text += character
+
 
 listen_to_stdin()

@@ -36,7 +36,7 @@ def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
 
 async def stream_audio(text):
     communicate = edge_tts.Communicate(text, voice, rate="+" + str(rate) + "%")
-    
+
     kill_existing_process()
     ffplay = subprocess.Popen(
         ["ffplay", "-i", "-", "-autoexit"],
@@ -65,7 +65,7 @@ async def save_to_file(text):
 
 
 def listen_to_stdin():
-    EOF = "\x1A"
+    EOF = "\x1a"
     text = ""
     while True:
         character = sys.stdin.read(1)
@@ -78,5 +78,6 @@ def listen_to_stdin():
                 asyncio.run(stream_audio(text))
             text = ""
         text += character
+
 
 listen_to_stdin()

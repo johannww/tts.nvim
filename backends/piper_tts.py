@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+import concurrent.futures
 import os
 import subprocess
 import sys
-import piper
 import wave
-import concurrent.futures
+
 import piper
 
 model = sys.argv[1]
@@ -79,6 +79,7 @@ def stream_audio(text, send_to_file=False):
             ffplay_proc.stdin.write(chunk.audio_int16_bytes)
             ffplay_proc.stdin.flush()
 
+
 def download_voice_if_needed():
     if not os.path.exists(os.path.join(voices_dir, model + ".onnx")):
         print(f"Downloading voice model '{model}'...", file=sys.stderr)
@@ -95,7 +96,7 @@ def download_voice_if_needed():
 
 
 def listen_to_stdin():
-    EOF = "\x1A"
+    EOF = "\x1a"
     text = ""
     ex = concurrent.futures.ThreadPoolExecutor()
     while True:
