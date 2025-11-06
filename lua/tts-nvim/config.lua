@@ -33,7 +33,7 @@ M.opts = {
             ["zh"] = "zh_CN-huayan-medium",
         },
         -- OpenAI TTS uses the same voice for all languages
-        -- Set the voice in openai_voice option below
+        -- Set the voice in openai.voice option below
     },
 
     -- Piper configuration
