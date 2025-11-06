@@ -4,6 +4,7 @@ import os
 import subprocess
 import sys
 import tempfile
+from openai import OpenAI
 
 voice = sys.argv[1]
 model = sys.argv[2]
@@ -31,21 +32,13 @@ def kill_existing_process():
 
 
 def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
-    lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
+    # lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
+    lines = [f"{ffplay_pid}"]
     with open(pid_file, "w") as f:
         f.writelines(lines)
 
 
-def generate_audio(text):
-    try:
-        from openai import OpenAI
-    except ImportError:
-        print(
-            "Error: openai package not installed. Install it with: pip install openai",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
+def generate_audio(text, send_to_file=False):
     if not api_key:
         print("Error: OpenAI API key not provided", file=sys.stderr)
         sys.exit(1)
@@ -58,21 +51,17 @@ def generate_audio(text):
     with client.audio.speech.with_streaming_response.create(
         model=model, voice=voice, input=text, speed=openai_speed
     ) as response:
-        if to_file:
+        if send_to_file:
             # Save directly to file
             response.stream_to_file(to_file)
         else:
             # Stream to ffplay
             kill_existing_process()
 
-            # Create a temporary file to store the audio
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp_file:
-                tmp_filename = tmp_file.name
-                response.stream_to_file(tmp_filename)
-
             # Play the audio with ffplay
             ffplay_proc = subprocess.Popen(
-                ["ffplay", "-i", tmp_filename, "-autoexit"],
+                ["ffplay", "-i", "-", "-autoexit"],
+                stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 start_new_session=True,
@@ -81,13 +70,12 @@ def generate_audio(text):
             thispid = os.getpid()
             write_pids_to_file(thispid, ffplay_proc.pid)
 
-            ffplay_proc.wait()
-
-            # Clean up temporary file
-            try:
-                os.unlink(tmp_filename)
-            except Exception:
-                pass
+            for chunk in response.iter_bytes():
+                try:
+                    ffplay_proc.stdin.write(chunk)
+                    ffplay_proc.stdin.flush()
+                except BrokenPipeError:
+                    break
 
 
 def listen_to_stdin():
@@ -98,7 +86,9 @@ def listen_to_stdin():
         character = sys.stdin.read(1)
         if character == EOF:
             print("Received EOF.", file=sys.stderr)
-            ex.submit(generate_audio, text)
+            send_to_file = text[-1] == "F"
+            text = text[:-1]
+            ex.submit(generate_audio, text, send_to_file)
             text = ""
         text += character
     print("Stdin closed.", file=sys.stderr)
