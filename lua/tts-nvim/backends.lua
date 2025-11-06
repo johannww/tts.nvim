@@ -58,7 +58,7 @@ M.backends.piper = {
         return plugin_dir .. "/backends/piper_tts.py"
     end,
 
-    get_args = function(text, config, nvim_data_dir, to_file)
+    get_args = function(config, nvim_data_dir, to_file)
         local model
         -- First check for language-specific model
         if config.languages_to_voice and config.languages_to_voice.piper then
@@ -68,7 +68,7 @@ M.backends.piper = {
         if not model then
             model = config.piper_model or "en_US-lessac-medium"
         end
-        local args = { text, model, tostring(config.speed), nvim_data_dir }
+        local args = { model, tostring(config.speed), nvim_data_dir }
         if to_file then
             to_file = to_file:gsub("%.mp3$", ".wav")
             table.insert(args, to_file)

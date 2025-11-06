@@ -6,56 +6,17 @@ local config = require("tts-nvim.config")
 local util = require("tts-nvim.util")
 local nvimDataDir = vim.fn.stdpath("data") .. "/tts-nvim/"
 
-local pid = nil
 local is_running = false
+M.job = nil
 
 M.tts = function()
     local text = util.getAndProcessText()
 
-    local backend = backends.get_backend(config.opts.backend)
-    if not backend then
-        print(
-            "Error: Unknown backend '"
-                .. config.opts.backend
-                .. "'. Available backends: "
-                .. table.concat(backends.get_available_backends(), ", ")
-        )
-        return
-    end
-
-    local valid, err = backend.validate_config(config.opts)
-    if not valid then
-        print("Error: " .. err)
-        return
-    end
-
-    local plugin_dir = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "")
-    local script_path = backend.get_script_path(plugin_dir)
-    local args = backend.get_args(text, config.opts, nvimDataDir, nil)
-
-    local job = Job:new({
-        command = script_path,
-        args = args,
-        cwd = ".",
-        on_start = function()
-            is_running = true
-        end,
-        on_exit = function()
-            is_running = false
-        end,
-        on_stderr = function(_, data)
-            if data ~= nil then
-                print("stderr: ", data)
-            end
-        end,
-    })
-    job:start()
-    pid = job.pid
+    local EOF = "\x1A"
+    M.job:send(text .. EOF)
 end
 
 M.tts_to_file = function()
-    local text = util.getAndProcessText()
-
     local backend = backends.get_backend(config.opts.backend)
     if not backend then
         print(
@@ -75,9 +36,9 @@ M.tts_to_file = function()
 
     local plugin_dir = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "")
     local script_path = backend.get_script_path(plugin_dir)
-    local args = backend.get_args(text, config.opts, nvimDataDir, "tts.mp3")
+    local args = backend.get_args(config.opts, nvimDataDir, "tts.mp3")
 
-    local job = Job:new({
+    M.job = Job:new({
         command = script_path,
         args = args,
         cwd = ".",
@@ -93,8 +54,7 @@ M.tts_to_file = function()
             end
         end,
     })
-    job:start()
-    pid = job.pid
+    M.job:start()
 end
 
 M.tts_set_language = function(args)
@@ -141,6 +101,36 @@ M.tts_set_backend = function(args)
                 .. table.concat(backends.get_available_backends(), ", ")
         )
     end
+
+    local valid, err = backend.validate_config(config.opts)
+    if not valid then
+        print("Error: " .. err)
+        return
+    end
+
+    M.on_exit()
+
+    local plugin_dir = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "")
+    local script_path = backend.get_script_path(plugin_dir)
+    local args = backend.get_args(config.opts, nvimDataDir, "tts.mp3")
+
+    M.job = Job:new({
+        command = script_path,
+        args = args,
+        cwd = ".",
+        on_start = function()
+            is_running = true
+        end,
+        on_exit = function()
+            is_running = false
+        end,
+        on_stderr = function(_, data)
+            if data ~= nil then
+                print("stderr: ", data)
+            end
+        end,
+    })
+    M.job:start()
 end
 
 M.get_available_backends = function()
@@ -178,11 +168,13 @@ end
 M.setup = function(opts)
     config.setup_config(opts)
     os.execute("mkdir -p " .. nvimDataDir)
+    M.tts_set_backend({ fargs = { config.opts.backend } })
 end
 
 M.on_exit = function()
     if is_running then
-        os.execute("kill " .. pid)
+        M.job:shutdown()
+        is_running = false
     end
 end
 

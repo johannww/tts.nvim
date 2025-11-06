@@ -4,12 +4,13 @@ import subprocess
 import sys
 import piper
 import wave
+import concurrent.futures
+import piper
 
-text = sys.argv[1]
-model = sys.argv[2]
-speed = float(sys.argv[3])
-nvim_data_dir = sys.argv[4]
-to_file = sys.argv[5] if len(sys.argv) > 5 else None
+model = sys.argv[1]
+speed = float(sys.argv[2])
+nvim_data_dir = sys.argv[3]
+to_file = sys.argv[4] if len(sys.argv) > 5 else None
 
 pid_file = os.path.join(nvim_data_dir, "pid.txt")
 
@@ -31,12 +32,13 @@ def kill_existing_process():
 
 
 def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
-    lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
+    lines = [f"{ffplay_pid}"]
+    # lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
     with open(pid_file, "w") as f:
         f.writelines(lines)
 
 
-def stream_audio():
+def stream_audio(text):
     kill_existing_process()
 
     # Adjust speed for piper (piper uses --length-scale, where values < 1.0 = faster, > 1.0 = slower)
@@ -87,9 +89,24 @@ def download_voice_if_needed():
                 "piper.download_voices",
                 "--download-dir",
                 voices_dir,
-                model
+                model,
             ]
         )
 
+
+def listen_to_stdin():
+    EOF = "\x1A"
+    text = ""
+    ex = concurrent.futures.ThreadPoolExecutor()
+    while True:
+        character = sys.stdin.read(1)
+        if character == EOF:
+            print("Received EOF.", file=sys.stderr)
+            ex.submit(stream_audio, text)
+            text = ""
+        text += character
+    print("Stdin closed.", file=sys.stderr)
+
+
 download_voice_if_needed()
-stream_audio()
+listen_to_stdin()
