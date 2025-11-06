@@ -23,3 +23,12 @@ end, {
         return M.get_available_backends()
     end,
 })
+
+vim.api.nvim_create_augroup("TTSNvim", { clear = true })
+vim.api.nvim_create_autocmd("ExitPre", {
+    group = "TTSNvim",
+    once = true,
+    callback = function()
+        M.on_exit()
+    end,
+})

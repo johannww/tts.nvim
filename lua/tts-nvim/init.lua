@@ -6,6 +6,9 @@ local config = require("tts-nvim.config")
 local util = require("tts-nvim.util")
 local nvimDataDir = vim.fn.stdpath("data") .. "/tts-nvim/"
 
+local pid = nil
+local is_running = false
+
 M.tts = function()
     local lines, coords = util.getVisualSelection()
     local search_string = util.getTextFromSelection(lines, coords)
@@ -36,6 +39,12 @@ M.tts = function()
         command = script_path,
         args = args,
         cwd = ".",
+        on_start = function()
+            is_running = true
+        end,
+        on_exit = function()
+            is_running = false
+        end,
         on_stderr = function(_, data)
             if data ~= nil then
                 print("stderr: ", data)
@@ -43,6 +52,7 @@ M.tts = function()
         end,
     })
     job:start()
+    pid = job.pid
 end
 
 M.tts_to_file = function()
@@ -75,6 +85,12 @@ M.tts_to_file = function()
         command = script_path,
         args = args,
         cwd = ".",
+        on_start = function()
+            is_running = true
+        end,
+        on_exit = function()
+            is_running = false
+        end,
         on_stderr = function(_, data)
             if data ~= nil then
                 print("stderr: ", data)
@@ -82,6 +98,7 @@ M.tts_to_file = function()
         end,
     })
     job:start()
+    pid = job.pid
 end
 
 M.tts_set_language = function(args)
@@ -165,6 +182,12 @@ end
 M.setup = function(opts)
     config.setup_config(opts)
     os.execute("mkdir -p " .. nvimDataDir)
+end
+
+M.on_exit = function()
+    if is_running then
+        os.execute("kill " .. pid)
+    end
 end
 
 return M
