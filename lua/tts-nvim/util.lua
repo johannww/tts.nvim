@@ -34,7 +34,9 @@ M.getTextFromSelection = function(lines, coords)
     return search_string
 end
 
-M.processText = function(text)
+M.getAndProcessText = function()
+    local lines, coords = M.getVisualSelection()
+    local text = M.getTextFromSelection(lines, coords)
     local text_processor = require("tts-nvim.text_processor")
     local config = require("tts-nvim.config")
     local filetype = vim.bo.filetype

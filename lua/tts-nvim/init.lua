@@ -10,9 +10,7 @@ local pid = nil
 local is_running = false
 
 M.tts = function()
-    local lines, coords = util.getVisualSelection()
-    local search_string = util.getTextFromSelection(lines, coords)
-    search_string = util.processText(search_string)
+    local text = util.getAndProcessText()
 
     local backend = backends.get_backend(config.opts.backend)
     if not backend then
@@ -33,7 +31,7 @@ M.tts = function()
 
     local plugin_dir = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "")
     local script_path = backend.get_script_path(plugin_dir)
-    local args = backend.get_args(search_string, config.opts, nvimDataDir, nil)
+    local args = backend.get_args(text, config.opts, nvimDataDir, nil)
 
     local job = Job:new({
         command = script_path,
@@ -56,9 +54,7 @@ M.tts = function()
 end
 
 M.tts_to_file = function()
-    local lines, coords = util.getVisualSelection()
-    local search_string = util.getTextFromSelection(lines, coords)
-    search_string = util.processText(search_string)
+    local text = util.getAndProcessText()
 
     local backend = backends.get_backend(config.opts.backend)
     if not backend then
@@ -79,7 +75,7 @@ M.tts_to_file = function()
 
     local plugin_dir = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "")
     local script_path = backend.get_script_path(plugin_dir)
-    local args = backend.get_args(search_string, config.opts, nvimDataDir, "tts.mp3")
+    local args = backend.get_args(text, config.opts, nvimDataDir, "tts.mp3")
 
     local job = Job:new({
         command = script_path,
