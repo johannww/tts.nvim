@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import asyncio
-import concurrent.futures
 import os
 import subprocess
 import sys
@@ -68,7 +67,6 @@ async def save_to_file(text):
 def listen_to_stdin():
     EOF = "\x1A"
     text = ""
-    ex = concurrent.futures.ThreadPoolExecutor()
     while True:
         character = sys.stdin.read(1)
         if character == EOF:
