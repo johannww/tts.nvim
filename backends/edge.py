@@ -59,6 +59,8 @@ async def stream_audio(text):
         elif chunk["type"] == "WordBoundary":
             pass
 
+    ffplay.stdin.close()
+
 
 async def save_to_file(text):
     communicate = edge_tts.Communicate(text, voice, rate="+" + str(rate) + "%")

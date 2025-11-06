@@ -78,6 +78,8 @@ def generate_audio(text, send_to_file=False):
                 except BrokenPipeError:
                     break
 
+            ffplay_proc.stdin.close()
+
 
 def listen_to_stdin():
     EOF = "\x1a"

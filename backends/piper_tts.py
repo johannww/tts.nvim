@@ -79,6 +79,8 @@ def stream_audio(text, send_to_file=False):
             ffplay_proc.stdin.write(chunk.audio_int16_bytes)
             ffplay_proc.stdin.flush()
 
+        ffplay_proc.stdin.close()
+
 
 def download_voice_if_needed():
     if not os.path.exists(os.path.join(voices_dir, model + ".onnx")):
