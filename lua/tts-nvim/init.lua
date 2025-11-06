@@ -53,6 +53,9 @@ M.tts_set_language = function(args)
                 .. " backend)"
         )
     end
+
+    -- Restart backend to apply language change
+    M.tts_set_backend({ fargs = { backend_name } })
 end
 
 M.tts_set_backend = function(args)
