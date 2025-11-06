@@ -10,7 +10,7 @@ import piper
 model = sys.argv[1]
 speed = float(sys.argv[2])
 nvim_data_dir = sys.argv[3]
-to_file = sys.argv[4] if len(sys.argv) > 5 else None
+to_file = sys.argv[4] if len(sys.argv) > 4 else None
 
 pid_file = os.path.join(nvim_data_dir, "pid.txt")
 
