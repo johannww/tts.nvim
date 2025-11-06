@@ -6,55 +6,23 @@ local config = require("tts-nvim.config")
 local util = require("tts-nvim.util")
 local nvimDataDir = vim.fn.stdpath("data") .. "/tts-nvim/"
 
-local is_running = false
+M.is_running = false
 M.job = nil
 
 M.tts = function()
     local text = util.getAndProcessText()
 
-    local EOF = "\x1A"
+    -- S for stream
+    local EOF = "S\x1A"
     M.job:send(text .. EOF)
 end
 
 M.tts_to_file = function()
-    local backend = backends.get_backend(config.opts.backend)
-    if not backend then
-        print(
-            "Error: Unknown backend '"
-                .. config.opts.backend
-                .. "'. Available backends: "
-                .. table.concat(backends.get_available_backends(), ", ")
-        )
-        return
-    end
+    local text = util.getAndProcessText()
 
-    local valid, err = backend.validate_config(config.opts)
-    if not valid then
-        print("Error: " .. err)
-        return
-    end
-
-    local plugin_dir = debug.getinfo(1, "S").source:sub(2):gsub("lua/tts%-nvim/init%.lua", "")
-    local script_path = backend.get_script_path(plugin_dir)
-    local args = backend.get_args(config.opts, nvimDataDir, "tts.mp3")
-
-    M.job = Job:new({
-        command = script_path,
-        args = args,
-        cwd = ".",
-        on_start = function()
-            is_running = true
-        end,
-        on_exit = function()
-            is_running = false
-        end,
-        on_stderr = function(_, data)
-            if data ~= nil then
-                print("stderr: ", data)
-            end
-        end,
-    })
-    M.job:start()
+    -- F for file
+    local EOF = "F\x1A"
+    M.job:send(text .. EOF)
 end
 
 M.tts_set_language = function(args)
@@ -119,10 +87,10 @@ M.tts_set_backend = function(args)
         args = args,
         cwd = ".",
         on_start = function()
-            is_running = true
+            M.is_running = true
         end,
         on_exit = function()
-            is_running = false
+            M.is_running = false
         end,
         on_stderr = function(_, data)
             if data ~= nil then
@@ -172,9 +140,10 @@ M.setup = function(opts)
 end
 
 M.on_exit = function()
-    if is_running then
+    if M.is_running then
+        -- os.execute("kill -9 " .. M.job.pid)
         M.job:shutdown()
-        is_running = false
+        M.is_running = false
     end
 end
 

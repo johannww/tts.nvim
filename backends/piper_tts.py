@@ -38,7 +38,7 @@ def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
         f.writelines(lines)
 
 
-def stream_audio(text):
+def stream_audio(text, send_to_file=False):
     kill_existing_process()
 
     # Adjust speed for piper (piper uses --length-scale, where values < 1.0 = faster, > 1.0 = slower)
@@ -48,7 +48,7 @@ def stream_audio(text):
     model_path = os.path.join(voices_dir, model + ".onnx")
     voice = piper.PiperVoice.load(model_path=model_path)
 
-    if to_file:
+    if send_to_file:
         with wave.open(to_file, "wb") as wav_file:
             voice.synthesize_wav(text=text, wav_file=wav_file, syn_config=syn_config)
     else:
@@ -102,7 +102,9 @@ def listen_to_stdin():
         character = sys.stdin.read(1)
         if character == EOF:
             print("Received EOF.", file=sys.stderr)
-            ex.submit(stream_audio, text)
+            send_to_file = text[-1] == "F"
+            text = text[:-1]
+            ex.submit(stream_audio, text, send_to_file)
             text = ""
         text += character
     print("Stdin closed.", file=sys.stderr)
