@@ -1,5 +1,6 @@
 import os
 import signal
+import sys
 
 
 class SigTermHandler:
@@ -9,6 +10,7 @@ class SigTermHandler:
 
     def handle_sigterm(self, signum, frame):
         kill_existing_process(self.pid_file)
+        sys.exit(0)
 
 
 def kill_existing_process(pid_file: str):
