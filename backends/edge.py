@@ -43,7 +43,6 @@ async def stream_audio(text):
         elif chunk["type"] == "WordBoundary":
             pass
 
-    print("Finished streaming", file=sys.stderr)
     ffplay.stdin.close()
 
 
