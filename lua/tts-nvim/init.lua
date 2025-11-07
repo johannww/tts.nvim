@@ -144,7 +144,7 @@ end
 
 M.on_exit = function()
     if M.is_running then
-        os.execute("kill -9 " .. M.job.pid)
+        os.execute("kill " .. M.job.pid)
         M.job:shutdown()
         M.is_running = false
     end
