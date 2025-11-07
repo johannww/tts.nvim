@@ -64,7 +64,7 @@ def listen_to_stdin():
             if send_to_file:
                 asyncio.run(save_to_file(text))
             else:
-                ex.submit(lambda: asyncio.run(stream_audio(text)))
+                ex.submit(asyncio.run, stream_audio(text))
             text = ""
         text += character
 
