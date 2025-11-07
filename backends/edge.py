@@ -2,9 +2,11 @@
 import asyncio
 import concurrent.futures
 import os
+import signal
 import subprocess
 import sys
 
+import common
 import edge_tts
 
 voice = sys.argv[1]
@@ -15,30 +17,10 @@ to_file = sys.argv[4] if len(sys.argv) > 4 else None
 pid_file = os.path.join(nvim_data_dir, "pid.txt")
 
 
-def kill_existing_process():
-    if os.path.exists(pid_file):
-        with open(pid_file, "r") as f:
-            lines = f.readlines()
-        try:
-            for line in lines:
-                if line.strip().isdigit():
-                    pid = int(line.strip())
-                    os.kill(pid, 9)
-        except Exception:
-            pass
-
-
-def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
-    # lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
-    lines = [f"{ffplay_pid}"]
-    with open(pid_file, "w") as f:
-        f.writelines(lines)
-
-
 async def stream_audio(text):
     communicate = edge_tts.Communicate(text, voice, rate="+" + str(rate) + "%")
 
-    kill_existing_process()
+    common.kill_existing_process(pid_file)
     ffplay = subprocess.Popen(
         ["ffplay", "-i", "-", "-autoexit"],
         stdin=subprocess.PIPE,
@@ -47,7 +29,7 @@ async def stream_audio(text):
         stderr=subprocess.DEVNULL,
     )
     thispid = os.getpid()
-    write_pids_to_file(thispid, ffplay.pid)
+    common.write_pids_to_file(pid_file, thispid, ffplay.pid)
 
     async for chunk in communicate.stream():
         if chunk["type"] == "audio":
@@ -56,9 +38,12 @@ async def stream_audio(text):
                 ffplay.stdin.flush()
             except BrokenPipeError:
                 break
+            except Exception as e:
+                print(f"Another error occurred: {e}", file=sys.stderr)
         elif chunk["type"] == "WordBoundary":
             pass
 
+    print("Finished streaming", file=sys.stderr)
     ffplay.stdin.close()
 
 
@@ -84,4 +69,5 @@ def listen_to_stdin():
         text += character
 
 
+common.SigTermHandler(pid_file)
 listen_to_stdin()

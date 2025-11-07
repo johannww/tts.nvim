@@ -5,6 +5,7 @@ import subprocess
 import sys
 import wave
 
+import common
 import piper
 
 model = sys.argv[1]
@@ -18,28 +19,8 @@ voices_dir = os.path.join(nvim_data_dir, "piper_voices")
 os.makedirs(voices_dir, exist_ok=True)
 
 
-def kill_existing_process():
-    if os.path.exists(pid_file):
-        with open(pid_file, "r") as f:
-            lines = f.readlines()
-        try:
-            for line in lines:
-                if line.strip().isdigit():
-                    pid = int(line.strip())
-                    os.kill(pid, 9)
-        except Exception:
-            pass
-
-
-def write_pids_to_file(this_script_pid: int, ffplay_pid: int):
-    lines = [f"{ffplay_pid}"]
-    # lines = [f"{this_script_pid}\n", f"{ffplay_pid}"]
-    with open(pid_file, "w") as f:
-        f.writelines(lines)
-
-
 def stream_audio(text, send_to_file=False):
-    kill_existing_process()
+    common.kill_existing_process(pid_file)
 
     # Adjust speed for piper (piper uses --length-scale, where values < 1.0 = faster, > 1.0 = slower)
     # Convert speed (where 1.0 = normal, 2.0 = 2x faster) to length_scale
@@ -73,7 +54,7 @@ def stream_audio(text, send_to_file=False):
         )
 
         thispid = os.getpid()
-        write_pids_to_file(thispid, ffplay_proc.pid)
+        common.write_pids_to_file(pid_file, thispid, ffplay_proc.pid)
 
         for chunk in iterable:
             ffplay_proc.stdin.write(chunk.audio_int16_bytes)
@@ -111,5 +92,6 @@ def listen_to_stdin():
         text += character
 
 
+common.SigTermHandler(pid_file)
 download_voice_if_needed()
 listen_to_stdin()
