@@ -15,8 +15,7 @@ M.getVisualSelection = function()
         line_start = line_start,
         line_end = line_end,
         column_start = column_start,
-        column_end =
-            column_end
+        column_end = column_end,
     }
     return lines, coordinates
 end
@@ -35,11 +34,13 @@ M.getTextFromSelection = function(lines, coords)
     return search_string
 end
 
-M.processText = function(text)
+M.getAndProcessText = function()
+    local lines, coords = M.getVisualSelection()
+    local text = M.getTextFromSelection(lines, coords)
     local text_processor = require("tts-nvim.text_processor")
     local config = require("tts-nvim.config")
     local filetype = vim.bo.filetype
-    
+
     return text_processor.process_text(text, filetype, config.opts)
 end
 
