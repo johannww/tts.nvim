@@ -17,7 +17,7 @@ M.process_markdown_simple = function(text)
     text = text:gsub("_(.-)_", "%1")
 
     -- Remove links but keep text
-    text = text:gsub("%[(.-)%]%(.-)", "%1")
+    text = text:gsub("%[(.-)%]%(.-%)", "%1")
 
     -- Remove inline code
     text = text:gsub("`(.-)`", "%1")

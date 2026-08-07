@@ -32,6 +32,9 @@ env/
 *.swo
 *~
 
+# Test dependencies
+tests/plenary.nvim/
+
 # OS
 .DS_Store
 Thumbs.db
