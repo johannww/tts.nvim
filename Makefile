@@ -45,4 +45,8 @@ install-formatters:
 	@echo "  - Via npm: npm install -g @johnnymorganz/stylua-bin"
 	@echo "  - Or download from: https://github.com/JohnnyMorganz/StyLua/releases"
 
-.PHONY: format format-python format-lua lint lint-python lint-lua check-format check-format-python check-format-lua install-formatters
+# Test commands
+test:
+	@nvim --headless -u NONE --cmd "set rtp=.,tests/plenary.nvim" -c "luafile tests/test_text_processor.lua" -c "q"
+
+.PHONY: format format-python format-lua lint lint-python lint-lua check-format check-format-python check-format-lua install-formatters test

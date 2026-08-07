@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Clone plenary.nvim
+        run: |
+          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim tests/plenary.nvim
+
+      - name: Run tests
+        run: make test
