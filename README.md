@@ -11,6 +11,7 @@ https://github.com/user-attachments/assets/f331db4b-ace3-475d-8423-e5e3df81083b
 
 ## Required (All backends)
 
+- Python 3 with `venv` support. The plugin uses it to create its private environment.
 - ffplay
 ```bash
 sudo apt install ffmpeg
@@ -18,34 +19,21 @@ sudo apt install ffmpeg
 ```bash
 sudo pacman -S ffmpeg
 ```
+```bash
+brew install ffmpeg
+```
 - plenary.nvim
 
 ## Backend-specific Dependencies
 
 ### Edge TTS (default backend)
-- edge-tts
-```bash
-pip install edge-tts
-```
-```bash
-yay -S python-edge-tts
-```
+The plugin creates a private virtual environment at Neovim's data directory and installs `edge-tts` automatically.
 
 ### Piper
-- piper-tts
-```bash
-pip install piper-tts
-```
-```bash
-yay -S piper-tts # this conflicts with the pacman piper package
-```
-Or install from source: [Piper Installation](https://github.com/OHF-Voice/piper1-gpl)
+The plugin installs `piper-tts` automatically when this backend is selected.
 
 ### OpenAI TTS
-- openai Python package
-```bash
-pip install openai
-```
+The plugin installs the `openai` Python package automatically when this backend is selected.
 - OpenAI API key (set as `OPENAI_API_KEY` environment variable)
 
 ## Optional (for syntax removal)

@@ -68,7 +68,7 @@ def download_voice_if_needed():
         print(f"Downloading voice model '{model}'...", file=sys.stderr)
         voice_download = subprocess.run(
             [
-                "python3",
+                sys.executable,
                 "-m",
                 "piper.download_voices",
                 "--download-dir",
